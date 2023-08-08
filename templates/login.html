@@ -1,8 +1,41 @@
 {% extends "base.html" %}
-    <title>Main Page</title>
-</head>
-<body>
-    <h1>Main Page</h1>
-    <div id="product-list"></div>
-</body>
-</html>
+​
+{% block content%}
+        <script>
+            $(document).ready(function() {
+                $("#login-button").click(function() {
+                    console.log('zzzz');
+                    var username = $("#loginId").val();
+                    var password = $("#loginPw").val();
+                    $.ajax({
+                        type: "POST",
+                        url: "/login",
+                        contentType: "application/json",
+                        data: JSON.stringify({ "username": username, "password": password }),
+                        success: function(data) {
+                            localStorage.setItem("token", data.token);
+                            window.location.href = "/";
+                        },
+                        error: function(error) {
+                            alert("Invalid credentials");
+                        }
+                    });
+                });
+​
+                $("#signup-button").click(function() {
+                    window.location.href = "/signup-page"; // 회원가입 페이지로 이동
+                });
+            });
+        </script>
+​
+        <h3> log in </h3>
+​
+        <!-- bootstarp -->
+​
+        <div id="login-container">
+            <input type="text" id="loginId" placeholder="ID">
+            <input type="password" id="loginPw" placeholder="Password">
+            <button id="login-button">Login</button>
+            <button id="signup-button">Sign Up</button>
+        </div>
+{% endblock content%}

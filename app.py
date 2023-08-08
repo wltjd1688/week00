@@ -7,6 +7,8 @@ import datetime
 # 운영체제에 따라 port 다르게 하기
 import platform
 
+import init, imagetest
+
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
@@ -18,7 +20,35 @@ secret_key = 'your_secret_key_here'
 # 메인 페이지
 @app.route('/')
 def main_Page():
-    return render_template('base.html' ,title = "home")
+
+    token = request.headers.get('Authorization').split(' ')[1]
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = decoded_token['userId']
+        
+        #user = db.users.find_one({'_id': ObjectId(user_id)})
+        user = db.users.find_one({'_id': user_id})
+
+        friend_ids = user['friends']
+        friends = db.users.find({'_id': {'$in': friend_ids}}, {'id': 1})
+        
+        friend_list = [{'username': friend['id']} for friend in friends]
+        
+        print(friend_list)
+        user_items = db.users.find_one({'_id' : user_id})['received_item']
+        result = []
+        for itemid in user_items :
+            item = db.items.find_one({'_id': itemid})
+            print(item)
+            result.append(item)
+        print(result)
+        # return jsonify({'friends': friend_list})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'message': 'Invalid token'}), 401
+
+    return render_template('base.html', title = "home", )
 
 # 로그인 페이지
 @app.route('/login')
@@ -110,23 +140,32 @@ def song() :
         result.append(item)
     return render_template('song.html', data=result)
     
-@app.route('/addMyItems', methods=['POST'])
+@app.route('/addItems', methods=['POST'])
 def song2():
     name = request.form['item_name']
     price = request.form['price']
     d_day = request.form['d_day']
     description = request.form['description']
-    img_url = request.form['img_url']
+    img_url = request.form['img_url'] 
+    #카테고리
+    img_url = imagetest.extract_image_url(img_url)
 
-    user_items = db.users.find_one({'user_id' : 'song'})['freind']
-    result = []
-    for itemid in user_items :
-        item = db.items.find_one({'_id': itemid})
-        print(item)
-        result.append(item)
-    return render_template('song.html', data=result)
+    item = {
+        'item_name': name,
+        'price': price,
+        'total_funding': 0,
+        'd-day': d_day,
+        'description': description,
+        'img_url': img_url,
+        'achievement_rate': 0
+    },
+
+    db.users.insert_one(item)
+    return jsonify({'result:success'})
 
 
+init.delete_existing_data()
+init.insert_initial_data()
 if platform.system()=="Darwin":
     if __name__ == '__main__':
         app.run('0.0.0.0', port=8000, debug=True)

@@ -1,3 +1,7 @@
-<nav class="navbar navbar-light bg-light">
+<nav class="navbar navbar-light bg-light justify-content-between">
     <span class="navbar-brand mb-0 h1">위시리스트</span>
+    <div id="profile">
+        <img class="rounded-circle" src="https://via.placeholder.com/24x24" alt="">
+        {%block owner%}{{owner}}{% endblock owner%}profile
+    </div>
 </nav>
