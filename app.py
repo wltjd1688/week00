@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import json
 import jwt
 import requests
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response
 import datetime
 # 운영체제에 따라 port 다르게 하기
 import platform
@@ -17,13 +17,41 @@ secret_key = 'your_secret_key_here'
 
 # 메인 페이지
 @app.route('/')
-def main_Page():
-    return render_template('base.html' ,title = 'home')
+def main_page():
+    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        # 여기에서 토큰 검증 로직 추가
+        return render_template('base.html', title='home')
+    except jwt.ExpiredSignatureError:
+        return redirect('/login')  # 토큰이 만료된 경우 로그인 페이지로 리다이렉트
+    except jwt.DecodeError:
+        return redirect('/login')
 
 # 로그인 페이지
 @app.route('/login')
 def login_Page():
     return render_template('login.html', title = "login")
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.json
+    print("Received data:", data)
+    username = data["username"]
+    password = data["password"]
+
+    # Check if the provided credentials are valid
+    user = db.users.find_one({'id': username, 'pw': password})
+    print("User:", user)
+
+    if user:
+        token = jwt.encode({"userId": str(user["_id"]), "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, secret_key, algorithm="HS256")
+        response = make_response(redirect(url_for('main_page')))  # 리다이렉트 생성
+        response.set_cookie('token', token, path='/')  # 쿠키에 토큰 설정
+        return response
+    else:
+        return jsonify({"error": "Invalid credentials"}), 401
 
 # 회원가입 페이지
 @app.route('/signup-page')
@@ -41,23 +69,6 @@ def signup():
     db.users.insert_one(new_member)
 
     return jsonify({"result": "success", "msg":"가입 완료!"})
-
-@app.route("/login", methods=["POST"])
-def login():
-    data = request.json
-    print("Received data:", data)
-    username = data["username"]
-    password = data["password"]
-
-    # Check if the provided credentials are valid
-    user = db.users.find_one({'id': username, 'pw': password})
-    print("User:", user)
-    
-    if user:
-        token = jwt.encode({"userId": str(user["_id"]), "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, secret_key, algorithm="HS256")
-        return jsonify({"token": token})
-    else:
-        return jsonify({"error": "Invalid credentials"}), 401
 
 # 친구 목록 가져오기
 @app.route('/friends', methods=['GET'])
