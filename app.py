@@ -99,6 +99,33 @@ def get_my_friend_products():
         return jsonify({'message': 'Token has expired'}), 401
     except jwt.DecodeError:
         return jsonify({'message': 'Invalid token'}), 401
+    
+@app.route('/getMyItems')
+def song() :
+    user_items = db.users.find_one({'user_id' : 'song'})['received_item']
+    result = []
+    for itemid in user_items :
+        item = db.items.find_one({'_id': itemid})
+        print(item)
+        result.append(item)
+    return render_template('song.html', data=result)
+    
+@app.route('/addMyItems', methods=['POST'])
+def song2():
+    name = request.form['item_name']
+    price = request.form['price']
+    d_day = request.form['d_day']
+    description = request.form['description']
+    img_url = request.form['img_url']
+
+    user_items = db.users.find_one({'user_id' : 'song'})['freind']
+    result = []
+    for itemid in user_items :
+        item = db.items.find_one({'_id': itemid})
+        print(item)
+        result.append(item)
+    return render_template('song.html', data=result)
+
 
 if platform.system()=="Darwin":
     if __name__ == '__main__':
