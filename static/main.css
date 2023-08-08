@@ -48,3 +48,30 @@
     text-decoration-line:underline;
     color:black;
 }
+
+.side-bar{
+    height:100vh;
+    width: 300px;
+    background: #aaa;
+    float:right;
+    position:fixed;
+    z-index:99;
+    right:0
+}
+
+.bar-content > div{
+    padding-bottom: 15px;
+}
+
+.bar-close{
+    z-index:100;
+    display:flex;
+    float:right;
+    position:absolute;
+    right:15px;
+    top:15px
+}
+
+.bar-close:hover, .bar-content > div:hover{
+    color:white;
+}
