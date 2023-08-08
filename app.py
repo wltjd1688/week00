@@ -7,6 +7,9 @@ import datetime
 # 운영체제에 따라 port 다르게 하기
 import platform
 
+# 이미지 URL 추출함수
+import image_method
+
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
@@ -110,6 +113,49 @@ def get_my_friend_products():
         return jsonify({'message': 'Token has expired'}), 401
     except jwt.DecodeError:
         return jsonify({'message': 'Invalid token'}), 401
+
+
+# 아이템 추가
+@app.route('/addItem', methods=['POST'])
+def addItem():
+    name = request.form['item_name']
+    price = request.form['price']
+    d_day = request.form['d_day']
+    description = request.form['description']
+    img_url = request.form['img_url'] 
+    #카테고리
+    img_url = image_method.extract_image_url(img_url)
+
+    item = {
+        'item_name': name,
+        'price': price,
+        'total_funding': 0,
+        'd-day': d_day,
+        'description': description,
+        'img_url': img_url,
+        'achievement_rate': 0
+    },
+    db.users.insert_one(item)
+    return jsonify({'result:success'})
+
+# 펀딩 API 추가
+@app.route('/fund/<item_id>', methods=['POST'])
+def funding(item_id):
+    item_id = int(item_id)
+    item = db.items.find_one({'_id' : item_id})
+    print(item)
+    price = item['price']
+    received = int(request.form['money'])
+    before_fund = item['total_funding']
+    sum = before_fund + received
+    rate = (sum) / price * 100
+    rounded_rate = round(rate, 2)  # 두 자리까지 반올림
+    print(rounded_rate)
+    db.items.update_one({'_id' : item_id},{'$set':{'total_funding':sum}})
+    db.items.update_one({'_id' : item_id},{'$set':{'achievement_rate':rounded_rate}})
+    item = db.items.find_one({'_id' : item_id})
+    return jsonify({'result':item})
+
 
 if platform.system()=="Darwin":
     if __name__ == '__main__':
