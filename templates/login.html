@@ -2,25 +2,24 @@
 
 {% block content%}
         <script>
-            $(document).ready(function() {
-                $("#login-button").click(function() {
-                    var username = $("#loginId").val();
-                    var password = $("#loginPw").val();
+            submitLogin((){
+                var username = $("#loginId").val();
+                var password = $("#loginPw").val();
 
-                    $.ajax({
-                        type: "POST",
-                        url: "/login",
-                        contentType: "application/json",
-                        data: JSON.stringify({ "username": username, "password": password }),
-                        success: function(data) {
-                            localStorage.setItem("token", data.token);
-                            window.location.href = "/";
-                        },
-                        error: function(error) {
-                            alert("Invalid credentials");
-                        }
-                    });
+                $.ajax({
+                    type: "POST",
+                    url: "/login",
+                    contentType: "application/json",
+                    data: JSON.stringify({ "username": username, "password": password }),
+                    success: function(data) {
+                        localStorage.setItem("token", data.token);
+                        window.location.href = "/";
+                    },
+                    error: function(error) {
+                        alert("Invalid credentials");
+                    }
                 });
+            });
 
                 $(".signup-button").click(function() {
                     window.location.href = "/signup-page"; // 회원가입 페이지로 이동
