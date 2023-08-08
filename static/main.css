@@ -1,0 +1,31 @@
+.main-nav{
+    height: 44px;
+    width: 100%;
+    padding: 0px !important;
+    box-sizing: border-box;
+    background: #eee;
+}
+
+.icon{
+    padding: 10px;
+    display:inline-block;
+    vertical-align: bottom;
+}
+
+.icon:hover{
+    background: #fff;
+}
+
+.card-tage{
+    padding: 20px 20px 0px 20px;
+}
+
+.perdday{
+    font-size: 14px;
+    color: skyblue;
+}
+
+.friend-profile{
+    width: 80px;
+    height: 80px;
+}

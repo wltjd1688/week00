@@ -18,7 +18,7 @@ secret_key = 'your_secret_key_here'
 # 메인 페이지
 @app.route('/')
 def main_Page():
-    return render_template('base.html' ,title = "home")
+    return render_template('base.html' ,title = 'home')
 
 # 로그인 페이지
 @app.route('/login')
