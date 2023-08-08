@@ -17,17 +17,18 @@ secret_key = 'your_secret_key_here'
 
 # 메인 페이지
 @app.route('/')
-def index():
-    return render_template('index.html')
+def main_Page():
+    return render_template('base.html' ,title = "home")
+
+# 로그인 페이지
+@app.route('/login')
+def login_Page():
+    return render_template('login.html', title = "login")
 
 # 회원가입 페이지
 @app.route('/signup-page')
 def signup_page():
     return render_template('signup.html')
-
-@app.route('/main')
-def main():
-    return render_template('main.html')
 
 @app.route('/signup', methods=["POST"])
 def signup():
