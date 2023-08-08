@@ -29,3 +29,22 @@
     width: 80px;
     height: 80px;
 }
+
+.login-frame{
+    max-width:400px;
+    width: 40%;
+    min-width: 300px;
+    border: 1px solid #eee;
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.signup-button{
+    text-decoration:none;
+    color:gainsboro;
+}
+
+.signup-button:hover{
+    text-decoration-line:underline;
+    color:black;
+}

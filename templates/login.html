@@ -6,6 +6,7 @@
                 $("#login-button").click(function() {
                     var username = $("#loginId").val();
                     var password = $("#loginPw").val();
+
                     $.ajax({
                         type: "POST",
                         url: "/login",
@@ -21,20 +22,29 @@
                     });
                 });
 
-                $("#signup-button").click(function() {
+                $(".signup-button").click(function() {
                     window.location.href = "/signup-page"; // 회원가입 페이지로 이동
                 });
             });
         </script>
 
-        <h3> log in </h3>
-
         <!-- bootstarp -->
-
-        <div id="login-container">
-            <input type="text" id="loginId" placeholder="ID">
-            <input type="password" id="loginPw" placeholder="Password">
-            <button id="login-button">Login</button>
-            <button id="signup-button">Sign Up</button>
+            <div class="login-frame mx-auto mt-5" id="login-container">
+                <h3> log in </h3>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Email address</label>
+                    <input type="email" class="form-control" id="loginId" aria-describedby="emailHelp" placeholder="ID">
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" class="form-control" id="loginPw">
+                </div>
+                <div class="form-group form-check">
+                    <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                </div>
+                <button type="submit" class="btn btn-primary d-block" id="login-button">Login</button>
+                <span>아직 회원이 아니신가요? <a class="signup-button">회원가입</a></span>
+            </div>
         </div>
 {% endblock content%}
