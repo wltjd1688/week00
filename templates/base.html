@@ -37,19 +37,18 @@
 
     </head>
     <body>
-        {% include "navigation.html"  %}
+    {% include "navigation.html"  %}
         {% block  content %}
-        <h3> log in </h3>       
-            <div id="friends">
-                <h2>My Friends</h2>
-                <ul id="friendsList"></ul>
-            </div>
+        <div id="friends">
+            <h2>My Friends</h2>
+            <ul id="friendsList"></ul>
+        </div>
         <div id="products">
             <h2>My Friends' Products</h2>
             <ul id="productsList"></ul>
         </div>
-        
-    {% endblock  content %}
+            
+        {% endblock  content %}
     </body>
 </html>
     
