@@ -32,7 +32,7 @@ def insert_initial_data():
             'mail' : 'go@naver.com'
         },
         {
-            '_id' : 3,
+            # '_id' : 3,
             'user_id': 'kim',
             'pw' : 'kim',
             'name': '삼번',
@@ -47,8 +47,13 @@ def insert_initial_data():
     item_data = [
         {
             '_id': 1,
-            'owner_id' : 1,
+            'owner' : {
+                '_id' : 1,
+                'name': '송원',
+                'image' : 'https://mblogthumb-phinf.pstatic.net/MjAyMDA2MTBfMTY1/MDAxNTkxNzQ2ODcyOTI2.Yw5WjjU3IuItPtqbegrIBJr3TSDMd_OPhQ2Nw-0-0ksg.8WgVjtB0fy0RCv0XhhUOOWt90Kz_394Zzb6xPjG6I8gg.PNG.lamute/user.png?type=w800',
+            },
             'name': '사과',
+            'item_name': '사과',
             'price': 110000,
             'total_fund': 0,
             'd-day': '2023-12-31',
@@ -58,7 +63,11 @@ def insert_initial_data():
         },
         {
             '_id': 2,
-            'owner_id' : 2,
+            'owner' : {
+                'id' : 2,
+                'name': '두번째 사용자',
+                'image' : 'https://mblogthumb-phinf.pstatic.net/MjAyMDA2MTBfMTY1/MDAxNTkxNzQ2ODcyOTI2.Yw5WjjU3IuItPtqbegrIBJr3TSDMd_OPhQ2Nw-0-0ksg.8WgVjtB0fy0RCv0XhhUOOWt90Kz_394Zzb6xPjG6I8gg.PNG.lamute/user.png?type=w800',
+            },            
             'name': '바나나',
             'price': 210000,
             'total_funding': 0,
@@ -69,7 +78,12 @@ def insert_initial_data():
         },
         {
             '_id': 3,
-            'owner_id' : 3,
+
+            'owner' : {
+                'id' : 3,
+                'name': '삼번',
+                'image' : 'https://mblogthumb-phinf.pstatic.net/MjAyMDA2MTBfMTY1/MDAxNTkxNzQ2ODcyOTI2.Yw5WjjU3IuItPtqbegrIBJr3TSDMd_OPhQ2Nw-0-0ksg.8WgVjtB0fy0RCv0XhhUOOWt90Kz_394Zzb6xPjG6I8gg.PNG.lamute/user.png?type=w800',
+            },              
             'name': '선인장',
             'price': 41000,
             'total_fund': 0,
@@ -80,7 +94,11 @@ def insert_initial_data():
         },
         {
             '_id': 4,
-            'owner_id' : 3,
+            'owner' : {
+                'id' : 3,
+                'name': '삼번',
+                'image' : 'https://mblogthumb-phinf.pstatic.net/MjAyMDA2MTBfMTY1/MDAxNTkxNzQ2ODcyOTI2.Yw5WjjU3IuItPtqbegrIBJr3TSDMd_OPhQ2Nw-0-0ksg.8WgVjtB0fy0RCv0XhhUOOWt90Kz_394Zzb6xPjG6I8gg.PNG.lamute/user.png?type=w800',
+            },   
             'name': '튀김소보로',
             'price': 3000,
             'total_fund': 0,
@@ -90,8 +108,12 @@ def insert_initial_data():
             'fund_rate': 0,
         },
         {
-            '_id': 5,
-            'owner_id' : 3,            
+            '_id': 5,       
+            'owner' : {
+                'id' : 3,
+                'name': '삼번',
+                'image' : 'https://mblogthumb-phinf.pstatic.net/MjAyMDA2MTBfMTY1/MDAxNTkxNzQ2ODcyOTI2.Yw5WjjU3IuItPtqbegrIBJr3TSDMd_OPhQ2Nw-0-0ksg.8WgVjtB0fy0RCv0XhhUOOWt90Kz_394Zzb6xPjG6I8gg.PNG.lamute/user.png?type=w800',
+            },   
             'name': '우유',
             'price': 59000,
             'total_fund': 0,
