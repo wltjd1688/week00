@@ -177,7 +177,7 @@ def addItem():
             'owner' : {
                 '_id' : user_id,
                 'name' : user['name'],
-                'img' : user['image'], 
+                'img' : user['img'], 
             },
             'name': name,
             'price': price,
@@ -188,9 +188,9 @@ def addItem():
             'fund_rate': 0
         }
         print(item)
-        db.users.insert_one(item)
+        db.items.insert_one(item)
 
-        return jsonify({'result:success'})
+        return jsonify({'result':'success'})
     except jwt.ExpiredSignatureError:
         return redirect('/login') 
     except jwt.DecodeError:
