@@ -149,6 +149,16 @@ def get_my_friend_products():
         return jsonify({'message': 'Token has expired'}), 401
     except jwt.DecodeError:
         return jsonify({'message': 'Invalid token'}), 401
+    
+# 프로필 화면전환 필요
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+# 위시리스트 화면전환 필요
+@app.route('/item')
+def item():
+    return render_template('item.html')
 
 
 # 아이템 추가
