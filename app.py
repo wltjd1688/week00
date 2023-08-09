@@ -25,7 +25,6 @@ def main_page():
 
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
-        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
 
         # 지금 디비 아이디가 수동 아이디에서 int로 바꿔줘야 해서 이렇게 씀
@@ -104,10 +103,28 @@ def signup():
     name_receive = request.form['name_give']
     mail_receive = request.form['mail_give']
 
-    new_member = {'id':id_receive, 'pw':pw_receive, 'name':name_receive, 'e-mail':mail_receive}
+    new_member = {'user_id':id_receive, 'password':pw_receive, 'name':name_receive, 'mail':mail_receive}
     db.users.insert_one(new_member)
 
     return jsonify({"result": "success", "msg":"가입 완료!"})
+
+# nav바에 사용자 이름, 사진 넘겨주기
+@app.route('/nav', methods=['GET'])
+def whoAmI():
+    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = decoded_token['userId']
+
+        user = db.users.find_one({'_id': user_id})
+        user_name = user['name']
+        user_img = user['image']
+        return jsonify({'result' : 'success', 'user_name' : user_name, 'user_img' : user_img})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'message': 'Invalid token'}), 401
 
 # 친구 목록 가져오기
 @app.route('/friends', methods=['GET'])
@@ -159,7 +176,6 @@ def profile():
 @app.route('/item')
 def item():
     return render_template('item.html')
-
 
 # 아이템 추가
 @app.route('/addItem', methods=['POST'])
