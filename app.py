@@ -85,12 +85,14 @@ def signup():
     pw_receive = request.form['pw_give']
     name_receive = request.form['name_give']
     mail_receive = request.form['mail_give']
+    img_recive = request.form['img_give']
 
     user = db.users.find_one({"user_id" : id_receive})
     if user:
         return jsonify({"result": "failure", "msg":"이미 존재하는 아이디입니다."})
 
     new_member = {'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive}
+
     db.users.insert_one(new_member)
 
     return jsonify({"result": "success", "msg":"가입 완료!"})
