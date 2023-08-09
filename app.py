@@ -8,7 +8,7 @@ import datetime
 import platform
 
 # 이미지 URL 추출함수
-import image_method
+import image_method, init_db
 
 app = Flask(__name__)
 
@@ -25,12 +25,51 @@ def main_page():
 
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
-        # 여기에서 토큰 검증 로직 추가
-        return render_template('base.html', title='home')
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = decoded_token['userId']
+
+        # 지금 디비 아이디가 수동 아이디에서 int로 바꿔줘야 해서 이렇게 씀
+        user_id = int(user_id)
+        user = db.users.find_one({'_id': user_id})
+        
+        #  최종에선 이거쓰면됨
+        #user = db.users.find_one({'_id': ObjectId(user_id)})
+
+        user_info = []
+        user_info.append({'name' : user['name']})
+        user_info.append({'image' : user['image']})
+        # print(user_info)
+        
+        friend_ids = user['friend']
+        friend_list = []
+        for friendid in friend_ids :
+            friend = db.users.find_one({'_id': friendid})
+            friend_list.append(friend)
+        # friends = db.users.find({'_id': {'$in': friend_ids}}, {'id': 1})
+        # friend_list = [{'username': friend['_id']} for friend in friends]
+        
+        # print(friend_list)
+
+        user_items = user['received_item']
+        item_list = []
+        for itemid in user_items :
+            item = db.items.find_one({'_id': itemid})
+            item_list.append(item)
+        # print(item_list)
+
+        data = [
+            {'user':user_info},
+            {'friends':friend_list},
+            {'items':item_list}
+        ]
+        # return jsonify(data)
+        return render_template('base.html', title='home', data='data')
     except jwt.ExpiredSignatureError:
         return redirect('/login')  # 토큰이 만료된 경우 로그인 페이지로 리다이렉트
     except jwt.DecodeError:
         return redirect('/login')
+    
+
 
 # 로그인 페이지
 @app.route('/login')
@@ -44,8 +83,7 @@ def login():
     username = data["username"]
     password = data["password"]
 
-    # Check if the provided credentials are valid
-    user = db.users.find_one({'id': username, 'pw': password})
+    user = db.users.find_one({'user_id': username, 'password': password})
     print("User:", user)
 
     if user:
@@ -156,6 +194,8 @@ def funding(item_id):
     item = db.items.find_one({'_id' : item_id})
     return jsonify({'result':item})
 
+init_db.delete_existing_data()
+init_db.insert_initial_data()
 
 if platform.system()=="Darwin":
     if __name__ == '__main__':
