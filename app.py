@@ -25,7 +25,6 @@ def main_page():
 
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
-        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
 
         # 지금 디비 아이디가 수동 아이디에서 int로 바꿔줘야 해서 이렇게 씀
