@@ -55,9 +55,10 @@ def main_page():
 @app.route('/item/<item_id>',methods=['GET'])
 def item(item_id) :
     item_id = int(item_id)
-    items = list(db.items.find({'_id' : item_id}))
+    item = db.items.find_one({'_id' : item_id})
     pays = list(db.pay.find({'_id' : item_id}))
-    return render_template('detail.html', item_info=items, pay_info=pays)
+    print(item)
+    return render_template('detail.html', item_info=item, pay_info=pays)
 
 # 로그인 페이지
 @app.route('/login')
@@ -138,7 +139,7 @@ def signup():
 
     new_member = {
         'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive, 'img' : img_url,
-        'rec_item' : ''
+        'rec_item' : []
     }
 
     db.users.insert_one(new_member)
