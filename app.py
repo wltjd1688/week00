@@ -28,7 +28,6 @@ def main_page():
         user_id = decoded_token['userId']
 
         # 지금 디비 아이디가 수동 아이디에서 int로 바꿔줘야 해서 이렇게 씀
-        user_id = int(user_id)
         user = db.users.find_one({'_id': user_id})
         
         #  최종에선 이거쓰면됨
@@ -63,7 +62,8 @@ def login():
     username = data["username"]
     password = data["password"]
 
-    user = db.users.find_one({'user_id': username, 'password': password})
+    user = db.users.find_one({'user_id': username, 'pw': password})
+
     print("User:", user)
 
     if user:
