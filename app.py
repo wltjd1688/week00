@@ -51,7 +51,6 @@ def main_page():
     except jwt.DecodeError:
         return redirect('/login')
 
-
 # 로그인 페이지
 @app.route('/login')
 def login_Page():
@@ -88,10 +87,43 @@ def signup():
     mail_receive = request.form['mail_give']
     img_recive = request.form['img_give']
 
-    new_member = {'id':id_receive, 'pw':pw_receive, 'name':name_receive, 'e-mail':mail_receive, 'img':img_recive}
+    user = db.users.find_one({"user_id" : id_receive})
+    if user:
+        return jsonify({"result": "failure", "msg":"이미 존재하는 아이디입니다."})
+
+    new_member = {'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive}
+
     db.users.insert_one(new_member)
 
     return jsonify({"result": "success", "msg":"가입 완료!"})
+
+# nav바에 사용자 이름, 사진 넘겨주기
+@app.route('/nav', methods=['GET'])
+def whoAmI():
+    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = decoded_token['userId']
+
+        user = db.users.find_one({'_id': user_id})
+        user_name = user['name']
+        user_img = user['image']
+        return jsonify({'result' : 'success', 'user_name' : user_name, 'user_img' : user_img})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'message': 'Invalid token'}), 401
+
+# 프로필 화면전환 필요
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+# 위시리스트 화면전환 필요
+@app.route('/item')
+def item():
+    return render_template('item.html')
 
 # 아이템 추가
 @app.route('/addItem', methods=['POST'])
