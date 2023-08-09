@@ -32,15 +32,6 @@
                 .split('; ')
                 .find(row => row.startsWith("token="))
                 .split('=')[1];
-            try {
-                var name = localStorage.getItem('username');
-                var img = localStorage.getItem('userimg');
-                $('#var-name, #username').text(name);
-                $('#var-img, #userimg').attr('src', img);
-                //$('#var-img, #userimg').attr('src', "../"+img);
-                $('#profile').show()
-            }
-            catch {
                 $.ajax({
                     type: "GET",
                     url: "/nav",
@@ -59,7 +50,6 @@
 
                 $('#profile').show()
                 }
-        }
         catch (error) {
             $('#profile').hide()
         }
@@ -91,9 +81,9 @@
     </div>
     <hr>
     <div class="bar-content">
-        <div id="edit-profile"><span href="/profile">개인정보수정</span></div>
-        <div id="addlist"><span href="/item">위시리스트 만들기</span></div>
-        <div id="alarm-follow"><span onclick="alarmShow()">알람</span>
+        <div id="edit-profile"><a href="/profile">개인정보수정</a></div>
+        <div id="addlist"><a href="/addItem">위시리스트 만들기</a></div>
+        <div id="alarm-follow"><a onclick="alarmShow()">알람</a>
             <!-- 알람 모달 -->
             <div class="modal non-show" style="color:black !important; background-color:rgba(0,0,0,0.8);" tabindex="-1" id="alarm-list" onclick="alarmHide()">
                 <div class="modal-dialog" onclick="event.stopPropagation()">
