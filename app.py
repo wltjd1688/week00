@@ -54,6 +54,13 @@ def main_page():
         return redirect('/login')  # 토큰이 만료된 경우 로그인 페이지로 리다이렉트
     except jwt.DecodeError:
         return redirect('/login')
+    
+@app.route('/item/<item_id>',methods=['GET'])
+def item(item_id) :
+    item_id = ObjectId(item_id)
+    items = list(db.item.find({'_id' : item_id}))
+    pays = list(db.pay.find({'_id' : item_id}))
+    return render_template('item.html', item_info=items, pay_info=pays)
 
 # 로그인 페이지
 @app.route('/login')
@@ -199,38 +206,38 @@ def addItem():
     except jwt.DecodeError:
         return redirect('/login')
 
-@app.route('/addItem/test', methods=['POST'])
-def addItemTest() :
-        user_id = 1
-        user = db.users.find_one({'_id': user_id})
+# @app.route('/addItem/test', methods=['POST'])
+# def addItemTest() :
+#         user_id = 1
+#         user = db.users.find_one({'_id': user_id})
         
-        #  최종에선 이거쓰면됨
-        #user = db.users.find_one({'_id': ObjectId(user_id)})
+#         #  최종에선 이거쓰면됨
+#         #user = db.users.find_one({'_id': ObjectId(user_id)})
 
-        name = request.form['name']
-        price = request.form['price']
-        d_day = request.form['d_day']
-        description = request.form['descr']
-        img_url = request.form['img_url'] 
+#         name = request.form['name']
+#         price = request.form['price']
+#         d_day = request.form['d_day']
+#         description = request.form['descr']
+#         img_url = request.form['img_url'] 
         
-        # img_url = image_method.extract_image_url(img_url)
+#         # img_url = image_method.extract_image_url(img_url)
 
-        item = {
-            'owner' : {
-                'id' : user_id,
-                'name' : user['name'],
-                'img' : user['image'], 
-            },
-            'name': name,
-            'price': price,
-            'total_fund': 0,
-            'd-day': d_day,
-            'descr': description,
-            'img_url': img_url,
-            'fund_rate': 0
-        }
-        db.items.insert_one(item)
-        return jsonify({'item':'zz'})
+#         item = {
+#             'owner' : {
+#                 'id' : user_id,
+#                 'name' : user['name'],
+#                 'img' : user['image'], 
+#             },
+#             'name': name,
+#             'price': price,
+#             'total_fund': 0,
+#             'd-day': d_day,
+#             'descr': description,
+#             'img_url': img_url,
+#             'fund_rate': 0
+#         }
+#         db.items.insert_one(item)
+#         return jsonify({'item':'zz'})
 
 # 펀딩 API 추가
 @app.route('/fund/<item_id>', methods=['POST'])
