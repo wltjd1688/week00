@@ -1,5 +1,65 @@
 {% extends 'base.html'%}
 
 {% block content %}
-    <h1>아이템 담는사이트</h1>
+    <script>
+        $(document).ready(function() {
+            $("#product_submit").click(function() {
+
+                var name_give = $("#product_name").val();
+                var price_give = $("#product_price").val();
+                var date_give = $("#product_date").val();
+                var descr_give = $("#product_descr").val();
+                var img_url_give = $("#product_img").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/addItem",
+                    data: { name:name_give, price:price_give, date:date_give, descr:descr_give,img_url:img_url_give},
+                    success: function(result) {
+                        console.log(1)
+                    },
+                    error: function(error) {
+                        console.log(2)
+                    }
+                });
+
+            });
+        });
+    </script>
+    <div class="card item-bg mx-auto mt-3 rounded" id="background">
+        <h3>위시리스트 추가하기</h3>
+        <div class="bg-fff item-form" id="additem-frame">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">이름</span>
+                </div>
+                <input type="text" class="form-control" id="product_name">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">가격</span>
+                </div>
+                <input type="text" class="form-control" id="product_price" >
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">마감날짜</span>
+                </div>
+                <input type="text" class="form-control" id="product_date" >
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">메모</span>
+                </div>
+                <textarea class="form-control" id="product_descr">
+                </textarea>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">이미지링크</span>
+                </div>
+                <input type="text" class="form-control" id="product_img">
+            </div>
+            <button class="btn btn-primary w-25 float-right" style="min-width:100px" id="product_submit">제출</button>
+        </div>
 {% endblock content%}

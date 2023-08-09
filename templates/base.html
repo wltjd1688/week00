@@ -82,9 +82,9 @@
                     {% block data %}
                         {% for data_item in data%}
                         <div class="col-3" id="friend-product">
-                            <div class="media m-auto">
+                            <div class="media m-auto p-2">
                                 <img class="rounded-circle" src="{{ data_item.owner.img }}" class="mr-3" style="width:24px; height:24px;">
-                                <p class="mb-1 p-2">{{data_item.owner.name}}</p>
+                                <p class="mb-1 px-2">{{data_item.owner.name}}</p>
                             </div>
                             <div class="card">
                                 <img src="{{ data_item.img_url }}" class="card-img-top" >
@@ -98,7 +98,8 @@
                                     </span>
                                 </div>
                                 <div class="card-body" style="padding-top:0px !important">
-                                    <h5>{{ data_item.descr }}</h5>
+                                    <h5>{{ data_item.name }}</h5>
+                                    <p>{{data_item.descr}}</p>
                                 </div>
                             </div>
                         </div>

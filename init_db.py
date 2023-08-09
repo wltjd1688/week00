@@ -17,7 +17,7 @@ def insert_initial_data():
             'friend': [2, 3],
             'my_item': [1],
             'rec_item': [2, 3, 4, 5],
-            'imag' : 'https://i.pinimg.com/originals/a7/ee/b8/a7eeb85a1d27390ebdf770f8cf31e434.jpg',
+            'img' : 'https://i.pinimg.com/originals/a7/ee/b8/a7eeb85a1d27390ebdf770f8cf31e434.jpg',
             'mail' : 'bae@naver.com'
         },
         {
@@ -53,7 +53,6 @@ def insert_initial_data():
                 'img' : 'https://mblogthumb-phinf.pstatic.net/MjAyMDA2MTBfMTY1/MDAxNTkxNzQ2ODcyOTI2.Yw5WjjU3IuItPtqbegrIBJr3TSDMd_OPhQ2Nw-0-0ksg.8WgVjtB0fy0RCv0XhhUOOWt90Kz_394Zzb6xPjG6I8gg.PNG.lamute/user.png?type=w800',
             },
             'name': '사과',
-            'item_name': '사과',
             'price': 110000,
             'total_fund': 0,
             'date': '2023-12-31',

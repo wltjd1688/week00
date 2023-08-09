@@ -38,8 +38,6 @@ def main_page():
         for itemid in user_items :
             item = db.items.find_one({'_id': itemid})
             item_list.append(item)
-        
-        print(item_list[0]['owner']['id'])
 
         data = [
             {'items':item_list}
@@ -115,19 +113,25 @@ def whoAmI():
     except jwt.DecodeError:
         return jsonify({'message': 'Invalid token'}), 401
 
-# 프로필 화면전환 필요
+# 프로필 요청
 @app.route('/profile')
-def profile():
+def profile_Page():
     return render_template('profile.html')
 
-# 위시리스트 화면전환 필요
+# 위시리스트 요청
 @app.route('/item')
-def item():
+def item_Page():
     return render_template('item.html')
+
+# 친구추가 요청
+@app.route('/friend')
+def friend_Page():
+    return render_template('friend.html')
 
 # 아이템 추가
 @app.route('/addItem', methods=['POST'])
 def addItem():
+    print('zzzzzz')
     token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
 
     try:
@@ -140,29 +144,31 @@ def addItem():
         
         #  최종에선 이거쓰면됨
         #user = db.users.find_one({'_id': ObjectId(user_id)})
+        print(user)
 
-        name = request.form['item_name']
+        name = request.form['name']
         price = request.form['price']
-        d_day = request.form['d_day']
-        description = request.form['description']
+        date = request.form['date']
+        descr = request.form['descr']
         img_url = request.form['img_url'] 
-        
+
         img_url = image_method.extract_image_url(img_url)
 
         item = {
             'owner' : {
-                'id' : user_id,
+                '_id' : user_id,
                 'name' : user['name'],
                 'img' : user['image'], 
             },
-            'item_name': name,
+            'name': name,
             'price': price,
-            'total_funding': 0,
-            'd-day': d_day,
-            'description': description,
+            'total_fund': 0,
+            'date': date,
+            'descr': descr,
             'img_url': img_url,
-            'achievement_rate': 0
+            'fund_rate': 0
         }
+        print(item)
         db.users.insert_one(item)
 
         return jsonify({'result:success'})
@@ -203,7 +209,6 @@ def addItemTest() :
             'img_url': img_url,
             'fund_rate': 0
         }
-        print(item)
         db.items.insert_one(item)
         return jsonify({'item':'zz'})
 
