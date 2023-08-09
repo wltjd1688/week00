@@ -62,7 +62,16 @@ def item(item_id) :
 # 로그인 페이지
 @app.route('/login')
 def login_Page():
-    return render_template('login.html', title = "login")
+    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+
+    if token:  # 토큰이 존재하면
+        try:
+            jwt.decode(token, secret_key, algorithms=['HS256'])  # 토큰 유효성 확인
+            return redirect('/')  # 이미 로그인 상태라면 '/'로 리다이렉트
+        except jwt.ExpiredSignatureError:  # 토큰이 만료된 경우
+            pass
+
+    return render_template('login.html', title="login")
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -85,6 +94,15 @@ def login():
 # 회원가입 페이지
 @app.route('/signup-page')
 def signup_page():
+    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+
+    if token:  # 토큰이 존재하면
+        try:
+            jwt.decode(token, secret_key, algorithms=['HS256'])  # 토큰 유효성 확인
+            return redirect('/')  # 이미 로그인 상태라면 '/'로 리다이렉트
+        except jwt.ExpiredSignatureError:  # 토큰이 만료된 경우
+            pass
+
     return render_template('signup.html')
 
 @app.route('/signup', methods=["POST"])
@@ -252,6 +270,14 @@ def respond_request(request_id, action):
 
     if action == 'accepted':
         new_request = {'requester_id':sender, 'requested_id':receiver, 'status':'unchecked', 'content' : 'accepted'}
+        db.users.update_one({'_id':ObjectId(receiver)}, {'$push':{'friend':ObjectId(sender)}}) #친구 요청을 보낸 사람의 friend 리스트에 수락을 받은 사람의 '_id'를 추가
+        db.users.update_one({'_id':ObjectId(sender)}, {'$push':{'friend':ObjectId(receiver)}}) #친구 요청을 수락한 사람의 friend 리스트에 수락을 요청한 사람의 '_id'를 추가
+        sender_info = db.users.find_one({'_id':ObjectId(sender)})
+        sender_item = sender_info['my_item']
+        db.users.update_one({'_id':ObjectId(receiver)}, {'$push':{'rec_item':{'$each':sender_item}}})
+        receiver_info = db.users.find_one({'_id':ObjectId(receiver)})
+        receiver_item = receiver_info['my_item']
+        db.users.update_one({'_id':ObjectId(sender)}, {'$push':{'rec_item':{'$each':receiver_item}}})
     else:
         new_request = {'requester_id':sender, 'requested_id':receiver, 'status':'unchecked', 'content' : 'declined'}
     
@@ -260,8 +286,7 @@ def respond_request(request_id, action):
 # 알림 확인하는 API
 @app.route('/notify_check/<request_id>', methods=['POST'])
 def check_notification(request_id):
-    db.requests.find_one_and_update({'_id':request_id}, {'$set':{'status':'checked'}})
-
+    db.requests.update_one({'_id':request_id}, {'$set':{'status':'checked'}})
 
 # 펀딩 API 추가
 @app.route('/fund/<item_id>', methods=['POST'])
