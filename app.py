@@ -65,13 +65,12 @@ def main_page():
     except jwt.DecodeError:
         return redirect('/login')
     
-@app.route('/item/<item_id>',methods=['GET'])
+@app.route('/item/<item_id>')
 def item(item_id) :
     item_id = int(item_id)
     item = db.items.find_one({'_id' : item_id})
-    pays = list(db.pay.find({'_id' : item_id}))
-    print(item)
-    return render_template('detail.html', item_info=item, pay_info=pays)
+    pay = list(db.pay.find({'item_id' : item_id}))
+    return render_template('detail.html', item_info=item, pay_info=pay)
 
 # 로그인 페이지
 @app.route('/login')
@@ -326,37 +325,38 @@ def funding(item_id):
     rate = (mid_fund) / price * 100
     rounded_rate = round(rate, 2)  # 두 자리까지 반올림
     print(rounded_rate)
-    # db.items.update_one({'_id' : item_id},{'$set':{'total_funding':sum}})
-    # db.items.update_one({'_id' : item_id},{'$set':{'achievement_rate':rounded_rate}})
-    # item = db.items.find_one({'_id' : item_id})
+    result=db.items.update_one({'_id' : item_id},{'$set':{'total_fund':mid_fund}})
+    print(result)
+    db.items.update_one({'_id' : item_id},{'$set':{'fund_rate':rounded_rate}})
+    item = db.items.find_one({'_id' : item_id})
 
-    # token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
-    # sys.quit()
+    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
 
-    # try:
-    #     decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
-    #     user_id = decoded_token['userId']        
-    #     user = db.users.find_one({'_id': ObjectId(user_id)})
-    #     sender_name = user['name']
-    #     db.pay.insert_one({
-    #         'item_id' : item_id,
-    #         'sender_name' : sender_name,
-    #         'price' : received,
-    #     })
-    # except jwt.ExpiredSignatureError:
-    #     db.pay.insert_one({
-    #         'item_id' : item_id,
-    #         'sender_name' : '익명의 기부천사',
-    #         'price' : received,
-    #     })
-
-    # except jwt.DecodeError:
-    #     db.pay.insert_one({
-    #         'item_id' : item_id,
-    #         'sender_name' : '익명의 기부천사',
-    #         'price' : received,
-    #     })
-    return jsonify({'result':item})
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = decoded_token['userId']        
+        user = db.users.find_one({'_id': ObjectId(user_id)})
+        sender_name = user['name']
+        db.pay.insert_one({
+            'item_id' : item_id,
+            'sender_name' : sender_name,
+            'price' : received,
+        })
+        return jsonify({'result':'success'})
+    except jwt.ExpiredSignatureError:
+        db.pay.insert_one({
+            'item_id' : item_id,
+            'sender_name' : '익명의 기부천사',
+            'price' : received,
+        })
+        return jsonify({'message':"감사합니다"})
+    except jwt.DecodeError:
+        db.pay.insert_one({
+            'item_id' : item_id,
+            'sender_name' : '익명의 기부천사',
+            'price' : received,
+        })
+        return jsonify({'message':"감사합니다"})
 
 @app.route('/fund/<item_id>', methods=['GET'])
 def fund_list(item_id) :

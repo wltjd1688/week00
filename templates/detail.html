@@ -15,6 +15,7 @@
         function attend(){
             $('#step, #pay').show();
             $('#attend').hide();
+            $('#pay-frame').removeClass('d-flex,justify-content-end')
         }
         function pay(){
             const money = $("#step").val();
@@ -23,10 +24,11 @@
                 url: "/fund/{{ item_info._id }}",
                 data: {'money':money},
                 success: function(response){
-                    alert("들어감")
+                    alert("감사합니다")
+                    location.reload();
                 },
                 error: function(response){
-                    alert("뭔가틀림")
+                    alert("오류가 발생했습니다.")
                 }
             })
         }
@@ -46,8 +48,8 @@
                         <p class="col text-left">{{item_info.fund_rate}}% 할당됨 </p>
                     </div>
                     <h5>진심으로 축하해주신분들</h5>
-                    <div class="bg-white d-flex justify-content-end p-2 pre-scrollable" style="height: 50%">
-                        <table class="w-100">
+                    <div class="bg-white p-2 pre-scrollable" style="height:200px; max-height:200px">
+                        <table>
                             <thead>
                             <tr class="text-center">
                                 <th class="w-50">이름</th>
@@ -55,21 +57,13 @@
                             </tr>
                             </thead>
                             <tbody class="text-right">
-                                <tr>
-                                    <td class="text-center">홍길동</td>
-                                    <td>100,000원</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-center">김철수</td>
-                                    <td>50,000원</td>
-                                </tr>
                         {% block pay_info %}
-                        {% for i in  pay_info%}
+                            {% for i in pay_info %}
                                 <tr>
-                                    <td class="text-center">{{i.name}}</td>
-                                    <td>{{i.pay}}원</td>
+                                    <td class="text-center">{{i.sender_name}}</td>
+                                    <td>{{i.price}}원</td>
                                 </tr>
-                        {% endfor %}
+                            {% endfor %}
                         {% endblock pay_info %}
                                 <tr style="border-top: 2px solid black">
                                     <td class="text-center"><b>전체 가격</b></td>
@@ -78,9 +72,9 @@
                             </tbody>
                         </table>     
                     </div>
-                    <div class="mt-2 d-flex justify-content-between">
-                        <input type="text" class="form-control w-75 non-show" placeholder="금액입력" id="step">
-                        <button class="btn btn-success" style="width:20%" onclick="attend()" id="attend">참여하기</button>
+                    <div class="mt-2 d-flex justify-content-end" id="pay-farme">
+                        <input type="text" class="form-control w-75 non-show px-2" placeholder="금액입력" id="step">
+                        <button class="btn btn-success text-center" style="width:20%" onclick="attend()" id="attend">참여하기</button>
                         <button class="btn btn-primary non-show" style="width:20%" id="pay" onclick="pay()">선물하기</button>
                     </div>
                 </div>
