@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 import json
 import jwt
 import requests
@@ -141,11 +142,6 @@ def profile_Page():
 @app.route('/item')
 def item_Page():
     return render_template('item.html')
-
-# 친구추가 요청
-@app.route('/friend')
-def friend_Page():
-    return render_template('friend.html')
 
 # 아이템 추가
 @app.route('/addItem', methods=['POST'])
