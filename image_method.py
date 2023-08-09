@@ -7,8 +7,8 @@ def extract_image_url(main_url):
     data = requests.get(main_url, headers=headers)
     soup = BeautifulSoup(data.text, 'html.parser')
     og_image = soup.select_one('meta[property="og:image"]')
-    url_image = og_image['content']
-
+    img_url = og_image['content']
+    
     if img_url.startswith("http"):
         return img_url
     elif img_url.startswith("//"):
