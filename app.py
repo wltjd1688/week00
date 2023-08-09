@@ -25,7 +25,6 @@ def main_page():
 
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
-        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
 
         # 지금 디비 아이디가 수동 아이디에서 int로 바꿔줘야 해서 이렇게 씀
@@ -35,21 +34,6 @@ def main_page():
         #  최종에선 이거쓰면됨
         #user = db.users.find_one({'_id': ObjectId(user_id)})
 
-        user_info = []
-        user_info.append({'name' : user['name']})
-        user_info.append({'image' : user['image']})
-        # print(user_info)
-        
-        friend_ids = user['friend']
-        friend_list = []
-        for friendid in friend_ids :
-            friend = db.users.find_one({'_id': friendid})
-            friend_list.append(friend)
-        # friends = db.users.find({'_id': {'$in': friend_ids}}, {'id': 1})
-        # friend_list = [{'username': friend['_id']} for friend in friends]
-        
-        # print(friend_list)
-
         user_items = user['received_item']
         item_list = []
         for itemid in user_items :
@@ -58,8 +42,6 @@ def main_page():
         # print(item_list)
 
         data = [
-            {'user':user_info},
-            {'friends':friend_list},
             {'items':item_list}
         ]
         # return jsonify(data)
@@ -109,61 +91,12 @@ def signup():
 
     return jsonify({"result": "success", "msg":"가입 완료!"})
 
-# 친구 목록 가져오기
-@app.route('/friends', methods=['GET'])
-def get_friends():
-    token = request.headers.get('Authorization').split(' ')[1]
-
-    try:
-        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
-        user_id = decoded_token['userId']
-        
-        user = db.users.find_one({'_id': ObjectId(user_id)})
-        friend_ids = user['friends']
-
-        friends = db.users.find({'_id': {'$in': friend_ids}}, {'id': 1})
-        friend_list = [{'username': friend['id']} for friend in friends]
-
-        return jsonify({'friends': friend_list})
-    except jwt.ExpiredSignatureError:
-        return jsonify({'message': 'Token has expired'}), 401
-    except jwt.DecodeError:
-        return jsonify({'message': 'Invalid token'}), 401
-
-@app.route('/my-friend-products', methods=['GET'])
-def get_my_friend_products():
-    token = request.headers.get('Authorization').split(' ')[1]
-
-    try:
-        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
-        user_id = decoded_token['userId']
-        
-        user = db.users.find_one({'_id': ObjectId(user_id)})
-        friend_ids = user['friends']
-
-        friend_products = db.products.find({'ownerId': {'$in': friend_ids}})
-        friend_product_list = [{'name': product['name'], 'description': product['description']} for product in friend_products]
-
-        return jsonify({'friendProducts': friend_product_list})
-    except jwt.ExpiredSignatureError:
-        return jsonify({'message': 'Token has expired'}), 401
-    except jwt.DecodeError:
-        return jsonify({'message': 'Invalid token'}), 401
-    
-# 프로필 화면전환 필요
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
-
-# 위시리스트 화면전환 필요
-@app.route('/item')
-def item():
-    return render_template('item.html')
-
-
 # 아이템 추가
 @app.route('/addItem', methods=['POST'])
 def addItem():
+
+    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+
     name = request.form['item_name']
     price = request.form['price']
     d_day = request.form['d_day']
@@ -173,6 +106,9 @@ def addItem():
     img_url = image_method.extract_image_url(img_url)
 
     item = {
+        'owner' : {
+            
+        },
         'item_name': name,
         'price': price,
         'total_funding': 0,
