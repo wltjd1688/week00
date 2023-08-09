@@ -10,6 +10,8 @@ import platform
 # 이미지 URL 추출함수
 import image_method, init_db
 
+import os
+
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
@@ -84,16 +86,30 @@ def signup():
     pw_receive = str(request.form['pw_give'])
     name_receive = request.form['name_give']
     mail_receive = request.form['mail_give']
-    # img_receive = request.form['img_give']
+    img_receive = request.files['img_give'] 
+    
+    img_url = ''
+    if not img_receive :
+        img_url = 'static/img/default.png'
+    else :
+        current_time = datetime.datetime.now()
+        formatted_time = current_time.strftime('%Y%m%d%H%M%S')  # 시간을 문자열로 변환
+        file_name = id_receive + formatted_time + img_receive.filename
+        
+        path = 'static/img/'
+        # 이미지 파일 저장
+        img_receive.save(os.path.join(path, file_name))
+        img_url = path + file_name
 
     user = db.users.find_one({"user_id" : id_receive})
+    print(img_url)
+
     if user:
         return jsonify({"result": "failure", "msg":"이미 존재하는 아이디입니다."})
 
-    new_member = {'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive}
+    new_member = {'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive, 'img' : img_url}
 
     db.users.insert_one(new_member)
-
     return jsonify({"result": "success", "msg":"가입 완료!"})
 
 # nav바에 사용자 이름, 사진 넘겨주기
