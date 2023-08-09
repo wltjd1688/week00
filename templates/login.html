@@ -25,7 +25,7 @@
                         type: "GET",
                         url: "/nav",
                         success: function(data) {
-                            localStorage.
+                            window.localStorage.setItem("profile", data)
                         }
                     })
                 });
