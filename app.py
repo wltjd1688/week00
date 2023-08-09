@@ -95,31 +95,84 @@ def signup():
 # 아이템 추가
 @app.route('/addItem', methods=['POST'])
 def addItem():
-
     token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
 
-    name = request.form['item_name']
-    price = request.form['price']
-    d_day = request.form['d_day']
-    description = request.form['description']
-    img_url = request.form['img_url'] 
-    #카테고리
-    img_url = image_method.extract_image_url(img_url)
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = decoded_token['userId']
 
-    item = {
-        'owner' : {
-            
-        },
-        'item_name': name,
-        'price': price,
-        'total_funding': 0,
-        'd-day': d_day,
-        'description': description,
-        'img_url': img_url,
-        'achievement_rate': 0
-    },
-    db.users.insert_one(item)
-    return jsonify({'result:success'})
+        # 지금 디비 아이디가 수동 아이디에서 int로 바꿔줘야 해서 이렇게 씀
+        user_id = int(user_id)
+        user = db.users.find_one({'_id': user_id})
+        
+        #  최종에선 이거쓰면됨
+        #user = db.users.find_one({'_id': ObjectId(user_id)})
+
+        name = request.form['item_name']
+        price = request.form['price']
+        d_day = request.form['d_day']
+        description = request.form['description']
+        img_url = request.form['img_url'] 
+        
+        img_url = image_method.extract_image_url(img_url)
+
+        item = {
+            'owner' : {
+                'id' : user_id,
+                'name' : user['name'],
+                'img' : user['image'], 
+            },
+            'item_name': name,
+            'price': price,
+            'total_funding': 0,
+            'd-day': d_day,
+            'description': description,
+            'img_url': img_url,
+            'achievement_rate': 0
+        }
+        db.users.insert_one(item)
+
+        return jsonify({'result:success'})
+    except jwt.ExpiredSignatureError:
+        return redirect('/login') 
+    except jwt.DecodeError:
+        return redirect('/login')
+
+
+
+@app.route('/addItem/test', methods=['POST'])
+def addItemTest() :
+        user_id = 1
+        user = db.users.find_one({'_id': user_id})
+        
+        #  최종에선 이거쓰면됨
+        #user = db.users.find_one({'_id': ObjectId(user_id)})
+
+        name = request.form['name']
+        price = request.form['price']
+        d_day = request.form['d_day']
+        description = request.form['descr']
+        img_url = request.form['img_url'] 
+        
+        # img_url = image_method.extract_image_url(img_url)
+
+        item = {
+            'owner' : {
+                'id' : user_id,
+                'name' : user['name'],
+                'img' : user['image'], 
+            },
+            'name': name,
+            'price': price,
+            'total_fund': 0,
+            'd-day': d_day,
+            'descr': description,
+            'img_url': img_url,
+            'fund_rate': 0
+        }
+        print(item)
+        db.items.insert_one(item)
+        return jsonify({'item':'zz'})
 
 # 펀딩 API 추가
 @app.route('/fund/<item_id>', methods=['POST'])
