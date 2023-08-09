@@ -30,27 +30,13 @@
         </style>
         <script>
             $(document).ready(function() {
-
-                $.ajax({
-                    type: "GET",
-                    url: "/login",
-                    contentType: "application/json",
-                    success: function(data) {
-                        localStorage.setItem("token", data.token);
-                        window.location.href = "/";
-                    },
-                    error: function(error) {
-                        alert("Invalid credentials");
-                    }
-                });
-            })
-
                 $(".icon").on("click",(e)=>{               
                     $(".icon").removeClass("bg-fff");
                     $("#"+e.target.id).addClass("bg-fff");
                     e.stopPropagation()
                     e.stopImmediatePropagation()
-                });
+                })
+            });
                 
         </script>
         <title>{% block title %}{{ title }}{% endblock title %}</title>
