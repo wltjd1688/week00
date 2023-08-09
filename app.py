@@ -34,7 +34,7 @@ def main_page():
         #  최종에선 이거쓰면됨
         #user = db.users.find_one({'_id': ObjectId(user_id)})
 
-        user_items = user['received_item']
+        user_items = user['rec_item']
         item_list = []
         for itemid in user_items :
             item = db.items.find_one({'_id': itemid})
