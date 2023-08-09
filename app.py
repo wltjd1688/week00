@@ -63,7 +63,7 @@ def login():
     username = data["username"]
     password = data["password"]
 
-    user = db.users.find_one({'user_id': username, 'password': password})
+    user = db.users.find_one({'user_id': username, 'pw': password})
     print("User:", user)
 
     if user:
