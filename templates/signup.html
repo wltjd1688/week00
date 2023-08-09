@@ -7,11 +7,15 @@
                 let new_pw = $('#signupPw').val();
                 let new_name = $('#signupName').val();
                 let new_mail = $('#signupEmail').val();
+                let imgInput = $('#signupImg')[0];
+                console.log(imgInput.files[0])
+                let new_img = JSON.stringify(imgInput.files[0]);
+                console.log(new_img)
 
                 $.ajax({
                     type: "POST",
                     url: "/signup",
-                    data: {id_give : new_id, pw_give : new_pw, name_give : new_name, mail_give : new_mail},
+                    data: {id_give : new_id, pw_give : new_pw, name_give : new_name, mail_give : new_mail, img_give: new_img},
                     success: function (response) {
                         if (response["result"] == "success") {
                             alert(response["msg"]);
@@ -40,11 +44,15 @@
             </div>
             <div class="form-group">
                 <label for="exampleInputPassword1">Name</label>
-                <input type="password" class="form-control" id="signupName" placeholder="name">
+                <input type="text" class="form-control" id="signupName" placeholder="name">
             </div>
             <div class="form-group">
                 <label for="exampleInputPassword1">E-mail</label>
                 <input type="email" class="form-control" id="signupEmail" placeholder="e-mail">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">image</label>
+                <input type="file" id="signupImg">
             </div>
             <button onclick="signUp()" class="btn btn-primary " id="login-button">Sign Up</button>
         </div>
