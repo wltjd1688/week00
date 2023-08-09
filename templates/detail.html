@@ -2,6 +2,35 @@
 
 {% block content %}
     {% block item_info %}
+    <script>
+        $(document).ready('on',()=>{
+            $.ajax({
+                type: 'GET',
+                url: "/fund/{{item_info._id}}",
+                success: function(response){
+                    console.log(response.payList)
+                }
+            })
+        })
+        function attend(){
+            $('#step, #pay').show();
+            $('#attend').hide();
+        }
+        function pay(){
+            const money = $("#step").val();
+            $.ajax({
+                type:'POST',
+                url: "/fund/{{ item_info._id }}",
+                data: {'money':money},
+                success: function(response){
+                    alert("들어감")
+                },
+                error: function(response){
+                    alert("뭔가틀림")
+                }
+            })
+        }
+    </script>
         <div class="container">
             <img src="" alt="">
             <h2 class="m-5 text-center">{{item_info.owner.name}}님이 받고싶어하는 선물</h2>
@@ -51,17 +80,11 @@
                     </div>
                     <div class="mt-2 d-flex justify-content-between">
                         <input type="text" class="form-control w-75 non-show" placeholder="금액입력" id="step">
-                        <button class="btn btn-success" onclick="attend()" id="attend">참여하기</button>
-                        <button class="btn btn-primary non-show" id="pay">선물하기</button>
+                        <button class="btn btn-success" style="width:20%" onclick="attend()" id="attend">참여하기</button>
+                        <button class="btn btn-primary non-show" style="width:20%" id="pay" onclick="pay()">선물하기</button>
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-            function attedn(){
-                $('#attend').hide();
-                $('#step, #pay').show();
-            }
-        </script>
     {% endblock item_info%}
 {% endblock content%}
