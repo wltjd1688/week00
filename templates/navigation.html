@@ -30,6 +30,19 @@
                 .split('; ')
                 .find(row => row.startsWith("token="))
                 .split('=')[1];
+            $.ajax({
+                type: "POST",
+                url: "/login",
+                contentType: "application/json",
+                data: JSON.stringify({ "username": username, "password": password }),
+                success: function(data) {
+                    localStorage.setItem("token", data.token);
+                    window.location.href = "/";
+                },
+                error: function(error) {
+                    alert("Invalid credentials");
+                }
+            });
             $('#profile').show()
             }
         catch (error) {
