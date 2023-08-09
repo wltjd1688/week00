@@ -20,17 +20,15 @@
                             alert("Invalid credentials");
                         }
                     });
-
                     $.ajax({
                         type: "GET",
                         url: "/nav",
                         success: function(data) {
-                            window.localStorage.setItem("profile", data)
+                            localStorage.setItem("profile", data)
                             console.log("저장완료")
                         }
                     })
                 });
-
                 $(".signup-button").click(function() {
                     window.location.href = "/signup-page"; // 회원가입 페이지로 이동
                 });
@@ -41,7 +39,7 @@
             <div class="login-frame mx-auto" id="login-container">
                 <h3 class="mb-4"> log in </h3>
                 <div class="form-group">
-                    <label for="exampleInputEmail1">Id address</label>
+                    <label for="exampleInputEmail1">Id</label>
                     <input type="text" class="form-control" id="loginId" aria-describedby="emailHelp" placeholder="ID">
                     <small id="loginID" class="form-text text-muted">We'll never share your email with anyone else.</small>
                 </div>
