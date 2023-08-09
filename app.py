@@ -3,6 +3,7 @@ import json
 import jwt
 import requests
 from flask import Flask, render_template, jsonify, request, redirect, url_for, make_response
+from bson.objectid import ObjectId
 import datetime
 # 운영체제에 따라 port 다르게 하기
 import platform
@@ -28,17 +29,12 @@ def main_page():
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
-        user_id = int(user_id)
-        # 지금 디비 아이디가 수동 아이디에서 int로 바꿔줘야 해서 이렇게 씀
-        user = db.users.find_one({'_id': user_id})
-        
-        #  최종에선 이거쓰면됨
-        #user = db.users.find_one({'_id': ObjectId(user_id)})
+        user = db.users.find_one({'_id': ObjectId(user_id)})
 
         user_items = user['rec_item']
         item_list = []
         for itemid in user_items :
-            item = db.items.find_one({'_id': itemid})
+            item = db.items.find_one({'_id': ObjectId(itemid)})
             item_list.append(item)
 
         data = [
@@ -109,7 +105,7 @@ def signup():
     if user:
         return jsonify({"result": "failure", "msg":"이미 존재하는 아이디입니다."})
 
-    new_member = {'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive, 'img' : img_url}
+    new_member = {'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive, 'img' : img_url, 'rec_item' : ''}
 
     db.users.insert_one(new_member)
     return jsonify({"result": "success", "msg":"가입 완료!"})
@@ -123,7 +119,7 @@ def whoAmI():
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
 
-        user = db.users.find_one({'_id': user_id})
+        user = db.users.find_one({'_id': ObjectId(user_id)})
         user_name = user['name']
         user_img = user['image']
         return jsonify({'result' : 'success', 'user_name' : user_name, 'user_img' : user_img})
@@ -156,13 +152,7 @@ def addItem():
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
-
-        # 지금 디비 아이디가 수동 아이디에서 int로 바꿔줘야 해서 이렇게 씀
-        user_id = int(user_id)
-        user = db.users.find_one({'_id': user_id})
-        
-        #  최종에선 이거쓰면됨
-        #user = db.users.find_one({'_id': ObjectId(user_id)})
+        user = db.users.find_one({'_id': ObjectId(user_id)})
         print(user)
 
         name = request.form['name']
@@ -196,8 +186,71 @@ def addItem():
     except jwt.DecodeError:
         return redirect('/login')
 
+# 친구 요청 보내는 API
+@app.route('/send_request/<requested_id>')
+def send_request(friend_id):
+    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = decoded_token['userId']
+        requester_id = ObjectId(user_id)
+        user = db.users.find_one({'_id':requester_id})
+        friend = db.users.find_one({'user_id':friend_id})
+        if friend:
+            friend_objectId = friend['_id']
+            if friend_objectId in user['friend']:
+                return jsonify({'result': 'failure', 'message':'이미 친구 추가가 되어 있습니다.'})
+            else:
+                friend_request = {
+                    "requester_id" : requester_id,
+                    "requester_name" : user['name'],
+                    "requested_id" : friend['_id'],
+                    "status" : "unchecked",
+                    "content" : "request"
+                }
+                db.requests.insert_one(friend_request)
+        else:
+            return jsonify({'result':'failure', 'message':'해당 아이디를 가진 사용자가 존재하지 않습니다.'})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'message': 'Invalid token'}), 401
 
+# 알림 조회하는 API
+@app.route('/notify_get')
+def get_notification():
+    token = request.cookies.get('token') #쿠키에서 토큰 가져오기
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = decoded_token['userId']
+        all_requests = list(db.requests.find({'requested_id':ObjectId(user_id), 'status':'unchecked'}))
+        request_num = len(all_requests)
+        return jsonify({'result':'success', 'all_requests':all_requests, 'request_num':request_num})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Token has expired'}), 401
+    except jwt.DecodeError:
+        return jsonify({'message': 'Invalid token'}), 401
 
+# 요청 수락/거절 전달하는 API
+@app.route('/respond_request/<request_id>/<action>')
+def respond_request(request_id, action):
+    friend_request = db.requests.find_one({'_id':request_id}, {'$set':{'status':'checked'}})
+    sender = friend_request['requested_id'] # 요청을 받은 사람이 응답을 보냄
+    receiver = friend_request['requester_id'] # 요청을 보낸 사람이 응답을 받음
+
+    if action == 'accepted':
+        new_request = {'requester_id':sender, 'requested_id':receiver, 'status':'unchecked', 'content' : 'accepted'}
+    else:
+        new_request = {'requester_id':sender, 'requested_id':receiver, 'status':'unchecked', 'content' : 'declined'}
+    
+    db.requests.insert_one(new_request)
+    
+# 알림 확인하는 API
+@app.route('/notify_check')
+def check_notification(request_id):
+    db.requests.find_one_and_update({'_id':request_id}, {'$set':{'status':'checked'}})
+
+#item 추가 API
 @app.route('/addItem/test', methods=['POST'])
 def addItemTest() :
         user_id = 1
@@ -229,7 +282,7 @@ def addItemTest() :
             'fund_rate': 0
         }
         db.items.insert_one(item)
-        return redirect('/')
+        return jsonify({'item':'zz'})
 
 # 펀딩 API 추가
 @app.route('/fund/<item_id>', methods=['POST'])
