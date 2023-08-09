@@ -85,10 +85,13 @@ def signup():
     pw_receive = str(request.form['pw_give'])
     name_receive = request.form['name_give']
     mail_receive = request.form['mail_give']
-    img_receive = request.files['img_give'] 
+    try:
+        img_receive = request.files['img_give'] 
+    except:
+        img_receive = str("")
     
     img_url = ''
-    if not img_receive :
+    if img_receive== str("") :
         img_url = 'static/img/default.png'
     else :
         current_time = datetime.datetime.now()
