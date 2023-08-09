@@ -229,7 +229,7 @@ def addItemTest() :
             'fund_rate': 0
         }
         db.items.insert_one(item)
-        return jsonify({'item':'zz'})
+        return redirect('/')
 
 # 펀딩 API 추가
 @app.route('/fund/<item_id>', methods=['POST'])
