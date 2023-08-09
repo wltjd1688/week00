@@ -1,6 +1,9 @@
 *{
     box-sizing: border-box;
 }
+hr{
+    margin:0;
+}
 .main-nav{
     height: 44px;
     width: 100%;
@@ -85,8 +88,13 @@
     top:15px
 }
 
-.bar-close:hover, .bar-content > div:hover, .bar-content > div > a:hover {
-    color:white;
+.bar-content > div{
+    margin:10px;
+    padding: 2px;
+}
+
+.bar-close:hover, .bar-content > div:hover {
+    background:white;
 }
 
 .non-show{

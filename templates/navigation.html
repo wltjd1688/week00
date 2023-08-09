@@ -66,14 +66,25 @@
     function firendShow(){
         $("#firend-find").toggle();
     }
+    //--사이트이동
+    function mv_profile(){
+        var currentUrl = window.location.href; // 현재 URL 가져오기
+        var newUrl = currentUrl.replace(/\/[^\/]*$/, '/profile'); // 끝부분 변경
+        window.location.href = newUrl;
+    }
+    function mv_addItem(){
+        var currentUrl = window.location.href; // 현재 URL 가져오기
+        var newUrl = currentUrl.replace(/\/[^\/]*$/, '/addItem'); // 끝부분 변경
+        window.location.href = newUrl;
+    }
 </script>
 
 <!-- 사이드바 -->
 <div class="side-bar justify-content-center text-center non-show">
     <div class="m-4" id="bar-profile">
-        <div class="bar-close" id="close" onclick="sideBarHide()">
+        <div class="bar-close" style="background: none !important;" id="close" onclick="sideBarHide()">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <a aria-hidden="true" style="font-size:30px">&times;</a>
+                <a aria-hidden="true" style="font-size:30px;">&times;</a>
             </button>
         </div>
         <img class="rounded-circle d-inline img-100x100" src="../static/img/default.png" id="var-img"/>
@@ -81,9 +92,9 @@
     </div>
     <hr>
     <div class="bar-content">
-        <div id="edit-profile"><a href="/profile">개인정보수정</a></div>
-        <div id="addlist"><a href="/addItem">위시리스트 만들기</a></div>
-        <div id="alarm-follow"><a onclick="alarmShow()">알람</a>
+        <div id="edit-profile" onclick="mv_profile()">개인정보수정</div>
+        <div id="addlist" onclick="mv_addItem()">위시리스트 만들기</div>
+        <div id="alarm-follow" onclick="alarmShow()">알람
             <!-- 알람 모달 -->
             <div class="modal non-show" style="color:black !important; background-color:rgba(0,0,0,0.8);" tabindex="-1" id="alarm-list" onclick="alarmHide()">
                 <div class="modal-dialog" onclick="event.stopPropagation()">
@@ -129,9 +140,9 @@
             </div>
             <!--  -->
         </div>
-        <div style="padding:0px" id="addlist"><span onclick="firendShow()">친구추가</span></div>
+        <div id="addlist" onclick="firendShow()">친구추가</div>
         <!-- 친구찾기 -->
-            <div class="non-show bg-light w-100 pb-0 mt-2" id="firend-find">
+            <div class="non-show bg-light pb-0 mt-2" id="firend-find">
                 <div class="input-group p-2 ">
                     <input type="text" class="form-control" placeholder="친구 아이디" aria-label="Recipient's username" aria-describedby="button-addon2">
                     <div class="input-group-append">
@@ -140,7 +151,7 @@
                 </div>
             </div>
             <hr>
-            <div class="bar-content" onclick="logOut()" id="logout"><span>로그아웃</span></div>
+            <div class="bar-content" onclick="logOut()" id="logout">로그아웃</div>
             <!--  -->
         </div>
     </div>
