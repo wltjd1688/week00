@@ -56,15 +56,81 @@
     });
     //--알림 모달창 보여주기
     function alarmShow(){
-        $("#alarm-list").show()
+        $('.modal-body').empty();
+
+        $.ajax ({
+            type: "GET",
+            url: "/notify_get",
+            success: function(response) {
+                if (response.result == 'success') {
+                    let requests = response.all_requests;
+                    console.log(requests)
+                    let req_num = response.request_num;
+                    console.log(req_num)
+                    for (let i=0; i<req_num; i++) {
+                        console.log(i)
+                        let request = requests[i];
+                        let req_id = request['_id'];
+                        console.log(req_id)
+                        console.log(typeof(req_id))
+                        let name = request['requester_name'];
+                        let content = request['content'];
+                        console.log(content)
+                        let temp_html = ''
+                        if (content === "request") {
+                            console.log('33')
+                            temp_html = 
+                            `<div class="mx-2 my-1 p-auto border rounded">
+                                <div class="p-2 d-flex justify-content-end" id="alarm-confirm">
+                                    <p class="m-auto text-center">${name}이(가) 친구 신청을 보냈습니다.</p>
+                                    <div class="justifly-content-end">
+                                        <span class="btn btn-success mr-1" onclick="respondRequest(true, '${req_id}')">수락</span>
+                                        <span class="btn btn-danger" onclick="respondRequest(false, '${req_id}')">거절</span>
+                                    </div>
+                                </div>
+                            </div>`;                           
+                        } else if (content === "accepted") {
+                            temp_html =
+                            `<div class="mx-2 my-1 p-auto border border-success rounded">
+                                <div class="p-2 d-flex justify-content-end" id="alarm-yes">
+                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 수락하였습니다.</p>
+                                    <div class="d-flex justify-content-end">
+                                        <span class="btn btn-primary " onclick="checkNotification(${req_id})">확인</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } else {
+                            temp_html =
+                            `<div class="mx-2 my-1 p-auto border border-danger rounded">
+                                <div class="p-2 d-flex justify-content-end" id="alarm-no">
+                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 거절하였습니다.</p>
+                                    <div class="d-flex justify-content-end">
+                                        <span class="btn btn-primary" onclick="checkNotification(${req_id})">확인</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                        }
+                        console.log(44)
+                        $('.modal-body').append(temp_html);
+                        console.log(55)
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(error) {
+                console.log('error')
+            }
+        });
+        $("#alarm-list").show();
     };
 
     function alarmHide(){
         $("#alarm-list").hide()
     }
     //--친구 찾기창 보여주기
-    function firendShow(){
-        $("#firend-find").toggle();
+    function friendShow(){
+        $("#friend-find").toggle();
     }
     //--사이트이동
     function mv_profile(){
@@ -80,12 +146,13 @@
     //--친구 추가 요청 보내기
     function sendRequest() {
         let friend_id = $('#friend_id').val();
-
+        console.log(0);
         $.ajax ({
             type: "GET",
             url: "/send_request/"+friend_id,
             success: function(response) {
                 if (response.result == 'success') {
+                    console.log(1);
                     alert(response.message);
                 } else {
                     alert(response.message);
@@ -93,78 +160,21 @@
             }
         });
     }
-    //--모든 알림 받기
-    function getNotification(all_requests, request_num) {
-        $.ajax ({
-            type: "GET",
-            url: "/notify_get",
-            success: function(response) {
-                if (response.result == 'success') {
-                    let requests = response.all_requests;
-                    let req_num = response.resquest_num;
-
-                    for (let i=0; i<req_num; i++) {
-                        let request = requests[i];
-                        let req_id = request['_id'];
-                        let name = request['requester_name'];
-                        let content = request['content'];
-                        if (content == "request") {
-                            let temp_html = 
-                            `<div class="mx-2 my-1 p-auto border rounded" data-id=${req_id} id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-confirm">
-                                    <p class="m-auto text-center">${name}이(가) 친구 신청을 보냈습니다.</p>
-                                    <div class="justifly-content-end">
-                                        <span class="btn btn-success mr-1" onclick="respondRequest(true)">수락</span>
-                                        <span class="btn btn-danger" onclick="respondRequest(false)">거절</span>
-                                    </div>
-                                </div>
-                            </div>`;                           
-                        } else if (content == "accepted") {
-                            let temp_html =
-                            `<div class="mx-2 my-1 p-auto border border-success rounded" data-id=${req_id} id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-yes">
-                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 수락하였습니다.</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary " onclick="checkNotification()">확인</span>
-                                    </div>
-                                </div>
-                            </div>`;
-                        } else {
-                            let temp_html =
-                            `<div class="mx-2 my-1 p-auto border border-danger rounded" data-id=${req_id} id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-no">
-                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 거절하였습니다.</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary" onclick="checkNotification()">확인</span>
-                                    </div>
-                                </div>
-                            </div>`;
-                        }
-                        
-                        $('.modal-body').append(temp_html);
-
-                    }
-                } else {
-                    alert(response.message);
-                }
-            },
-        });
-    }
     //--수락/거절 응답 전달하기
-    function respondRequest(boolean) {
+    function respondRequest(boolean, id) {
+        let action ='';
         if (boolean) {
-            action = accepted;
+            action = 'accepted';
         } else {
-            action = declined;
-        }
-        let req_id = $('.alarm-request').dataset.id;
-
+            action = 'declined';
+        };
+        console.log(action)
         $.ajax ({
             type: "POST",
-            url: '/respond_request/',
-            data: {'id_give':req_id, 'action':action},
+            url: '/respond_request',
+            data: {'id_give': id, 'action': action},
             success: function(response) {
-                if (response.result == 'success') {
+                if (response.result === 'success') {
                     console.log(response.message);
                 }
             }
@@ -215,47 +225,19 @@
                             </button>                      
                         </div>
                         <div class="modal-body">
-                            <!-- 요청옴 -->
-                            <div class="mx-2 my-1 p-auto border rounded" id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-confirm">
-                                    <p class="m-auto text-center">요청받은사람 이 친구신청을 했습니다.</p>
-                                    <div class="justifly-content-end">
-                                        <span class="btn btn-success mr-1" onclick="respondRequest(true)">수락</span>
-                                        <span class="btn btn-danger" onclick="respondRequest(false)">거절</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- 수락 -->
-                            <div class="mx-2 my-1 p-auto border border-success rounded" id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-yes">
-                                    <p class="m-auto pr-3">요청받은사람 이 친구신청을 받았습니다</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary ">확인</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- 거절 -->
-                            <div class="mx-2 my-1 p-auto border border-danger rounded" id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-no">
-                                    <p class="m-auto pr-3">요청보낸사람 이 친구신청을 거절했습니다.</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary">확인</span>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <!--  -->
         </div>
-        <div id="addlist" onclick="firendShow()">친구추가</div>
+        <div id="addlist" onclick="friendShow()">친구추가</div>
         <!-- 친구찾기 -->
             <div class="non-show bg-light pb-0 mt-2" id="friend-find">
                 <div class="input-group p-2 ">
                     <input type="text" class="form-control" id="friend_id" placeholder="친구 아이디" aria-label="Recipient's username" aria-describedby="button-addon2">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">찾기</button>
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="sendRequest()">찾기</button>
                     </div>
                 </div>
             </div>
