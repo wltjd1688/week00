@@ -32,7 +32,7 @@ def insert_initial_data():
             'mail' : 'go@naver.com'
         },
         {
-            # '_id' : 3,
+            '_id' : 3,
             'user_id': 'kim',
             'pw' : 'kim',
             'name': '삼번',
@@ -56,7 +56,7 @@ def insert_initial_data():
             'item_name': '사과',
             'price': 110000,
             'total_fund': 0,
-            'd-day': '2023-12-31',
+            'date': '2023-12-31',
             'descr': '맛있는사과',
             'img_url': 'http://thumbnail7.coupangcdn.com/thumbnails/remote/230x230ex/image/vendor_inventory/122e/9955ffdf377f1c42ab4b3f5c8c4d443124fe8f64d74878b28dcd26108c28.jpg',
             'fund_rate': 0,

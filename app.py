@@ -40,13 +40,14 @@ def main_page():
         for itemid in user_items :
             item = db.items.find_one({'_id': itemid})
             item_list.append(item)
-        # print(item_list)
+        
+        print(item_list[0]['owner']['id'])
 
         data = [
             {'items':item_list}
         ]
         # return jsonify(data)
-        return render_template('base.html', title='home', data='data')
+        return render_template('base.html', title='home', data = item_list)
     except jwt.ExpiredSignatureError:
         return redirect('/login')  # 토큰이 만료된 경우 로그인 페이지로 리다이렉트
     except jwt.DecodeError:
