@@ -285,7 +285,7 @@ def get_notification():
 def respond_request():
     request_id = request.form['id_give']
     action = request.form['action']
-    friend_request = db.requests.find_one({'_id':ObjectId(request_id)}, {'$set':{'status':'checked'}})
+    friend_request = db.requests.find_one_and_update({'_id':ObjectId(request_id)}, {'$set':{'status':'checked'}})
     sender = friend_request['requested_id'] # 요청을 받은 사람이 응답을 보냄
     receiver = friend_request['requester_id'] # 요청을 보낸 사람이 응답을 받음
 
