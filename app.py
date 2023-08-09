@@ -26,14 +26,14 @@ def main_page():
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
-
+        user_id = int(user_id)
         # 지금 디비 아이디가 수동 아이디에서 int로 바꿔줘야 해서 이렇게 씀
         user = db.users.find_one({'_id': user_id})
         
         #  최종에선 이거쓰면됨
         #user = db.users.find_one({'_id': ObjectId(user_id)})
 
-        user_items = user['received_item']
+        user_items = user['rec_item']
         item_list = []
         for itemid in user_items :
             item = db.items.find_one({'_id': itemid})
@@ -60,7 +60,7 @@ def login():
     data = request.json
     print("Received data:", data)
     username = data["username"]
-    password = data["password"]
+    password = str(data["password"])
 
     user = db.users.find_one({'user_id': username, 'pw': password})
 
@@ -82,10 +82,10 @@ def signup_page():
 @app.route('/signup', methods=["POST"])
 def signup():
     id_receive = request.form['id_give']
-    pw_receive = request.form['pw_give']
+    pw_receive = str(request.form['pw_give'])
     name_receive = request.form['name_give']
     mail_receive = request.form['mail_give']
-    img_recive = request.form['img_give']
+    # img_receive = request.form['img_give']
 
     user = db.users.find_one({"user_id" : id_receive})
     if user:
