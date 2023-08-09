@@ -178,11 +178,6 @@ def whoAmI():
     except jwt.DecodeError:
         return jsonify({'message': 'Invalid token'}), 401
 
-# 프로필 요청
-@app.route('/profile')
-def profile_Page():
-    return render_template('profile.html')
-
 # 위시리스트 요청
 @app.route('/addItem')
 def item_Page():
