@@ -85,7 +85,7 @@
     top:15px
 }
 
-.bar-close:hover, .bar-content > div:hover, .bar-content > div > a:hover{
+.bar-close:hover, .bar-content > div:hover, .bar-content > div > span:hover{
     color:white;
 }
 
@@ -103,4 +103,13 @@
 
 .item-form{
     padding: 20px 0px 0px 10px;
+}
+
+.img-100x100{
+    width: 100px;
+    height: 100px;
+}
+.img-24x24{
+    width: 24px;
+    height: 24px;
 }

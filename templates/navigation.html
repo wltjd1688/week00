@@ -15,6 +15,8 @@
     function logOut(){
         if (confirm('진짜 로그아웃 하십니까?')){
             document.cookie = 'token' + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=[something];"
+            window.localStorage.removeItem('username')
+            window.localStorage.removeItem('userimg')
             location.href = '../login'
         }
         else {
@@ -30,21 +32,34 @@
                 .split('; ')
                 .find(row => row.startsWith("token="))
                 .split('=')[1];
-            $.ajax({
-                type: "POST",
-                url: "/login",
-                contentType: "application/json",
-                data: JSON.stringify({ "username": username, "password": password }),
-                success: function(data) {
-                    localStorage.setItem("token", data.token);
-                    window.location.href = "/";
-                },
-                error: function(error) {
-                    alert("Invalid credentials");
-                }
-            });
-            $('#profile').show()
+            try {
+                var name = localStorage.getItem('username');
+                var img = localStorage.getItem('userimg');
+                $('#var-name, #username').text(name);
+                $('#var-img, #userimg').attr('src', img);
+                //$('#var-img, #userimg').attr('src', "../"+img);
+                $('#profile').show()
             }
+            catch {
+                $.ajax({
+                    type: "GET",
+                    url: "/nav",
+                    success: function(response) {
+                        localStorage.setItem('username',response.user_name);
+                        localStorage.setItem('userimg',response.user_img);
+                        console.log(response.user_img)
+                        $('#var-name, #username').text(response.user_name);
+                        //$('#var-img, #userimg').attr('src', "../"+response.user_img);
+                        $('#var-img, #userimg').attr('src', response.user_img);
+                    },
+                    error: function(error) {
+                        alert("Invalid credentials");
+                    }
+                });
+
+                $('#profile').show()
+                }
+        }
         catch (error) {
             $('#profile').hide()
         }
@@ -71,14 +86,14 @@
                 <a aria-hidden="true" style="font-size:30px">&times;</a>
             </button>
         </div>
-        <img class="rounded-circle d-inline" src="https://via.placeholder.com/100x100" alt="">
-        <p class="px-2" id="bar-name">profile</p>
+        <img class="rounded-circle d-inline img-100x100" src="../static/img/default.png" id="var-img"/>
+        <p class="px-2" id="var-name">가나다라마바사</p>
     </div>
     <hr>
     <div class="bar-content">
-        <div id="edit-profile"><a href="/profile">개인정보수정</a></div>
-        <div id="addlist"><a href="/item">위시리스트 만들기</a></div>
-        <div id="alarm-follow"><a onclick="alarmShow()">알람</a>
+        <div id="edit-profile"><span href="/profile">개인정보수정</span></div>
+        <div id="addlist"><span href="/item">위시리스트 만들기</span></div>
+        <div id="alarm-follow"><span onclick="alarmShow()">알람</span>
             <!-- 알람 모달 -->
             <div class="modal non-show" style="color:black !important; background-color:rgba(0,0,0,0.8);" tabindex="-1" id="alarm-list" onclick="alarmHide()">
                 <div class="modal-dialog" onclick="event.stopPropagation()">
@@ -124,7 +139,7 @@
             </div>
             <!--  -->
         </div>
-        <div style="padding:0px" id="addlist"><a onclick="firendShow()">친구찾기</a></div>
+        <div style="padding:0px" id="addlist"><span onclick="firendShow()">친구추가</span></div>
         <!-- 친구찾기 -->
             <div class="non-show bg-light w-100 pb-0 mt-2" id="firend-find">
                 <div class="input-group p-2 ">
@@ -134,17 +149,17 @@
                     </div>
                 </div>
             </div>
+            <hr>
+            <div class="bar-content" onclick="logOut()" id="logout"><span>로그아웃</span></div>
             <!--  -->
         </div>
-        <hr>
-        <div onclick="logOut()" id="logout">로그아웃</div>
     </div>
 </div>
 <!-- nav -->
 <nav class="navbar navbar-light bg-light justify-content-between">
     <a href="/" class="navbar-brand mb-0 h1">위시리스트</a>
     <div class="non-block" onclick="sideBarShow()" id="profile">
-        <img class="rounded-circle float-left " src="https://via.placeholder.com/24x24" alt="">
+        <img class="rounded-circle float-left img-24x24" src="../static/img/default.png" id="userimg">
         <div class="float-right px-2" id="username">profile</div>
     </div>
 </nav>

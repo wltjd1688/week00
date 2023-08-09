@@ -54,10 +54,11 @@ def main_page():
     
 @app.route('/item/<item_id>',methods=['GET'])
 def item(item_id) :
-    item_id = ObjectId(item_id)
-    items = list(db.item.find({'_id' : item_id}))
+    item_id = int(item_id)
+    items = list(db.items.find({'_id' : item_id}))
     pays = list(db.pay.find({'_id' : item_id}))
-    return render_template('item.html', item_info=items, pay_info=pays)
+    print(items)
+    return render_template('detail.html', item_info=items, pay_info=pays)
 
 # 로그인 페이지
 @app.route('/login')
@@ -137,7 +138,7 @@ def whoAmI():
 
         user = db.users.find_one({'_id': ObjectId(user_id)})
         user_name = user['name']
-        user_img = user['image']
+        user_img = user['img']
         return jsonify({'result' : 'success', 'user_name' : user_name, 'user_img' : user_img})
     except jwt.ExpiredSignatureError:
         return jsonify({'message': 'Token has expired'}), 401
@@ -150,14 +151,13 @@ def profile_Page():
     return render_template('profile.html')
 
 # 위시리스트 요청
-@app.route('/item')
+@app.route('/addItem')
 def item_Page():
-    return render_template('item.html')
+    return render_template('addItem.html')
 
 # 아이템 추가
 @app.route('/addItem', methods=['POST'])
 def addItem():
-    print('zzzzzz')
     token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
 
     try:
