@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 import json
 import jwt
 import requests
@@ -10,6 +11,7 @@ import platform
 
 # 이미지 URL 추출함수
 import image_method, init_db
+from bson.objectid import ObjectId
 
 import os
 
@@ -29,9 +31,12 @@ def main_page():
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
-        user = db.users.find_one({'_id': ObjectId(user_id)})
 
+        user = db.users.find_one({'_id': ObjectId(user_id)})
+        print(user)
+        
         user_items = user['rec_item']
+
         item_list = []
         for itemid in user_items :
             item = db.items.find_one({'_id': ObjectId(itemid)})
@@ -46,6 +51,13 @@ def main_page():
         return redirect('/login')  # 토큰이 만료된 경우 로그인 페이지로 리다이렉트
     except jwt.DecodeError:
         return redirect('/login')
+    
+@app.route('/item/<item_id>',methods=['GET'])
+def item(item_id) :
+    item_id = ObjectId(item_id)
+    items = list(db.item.find({'_id' : item_id}))
+    pays = list(db.pay.find({'_id' : item_id}))
+    return render_template('item.html', item_info=items, pay_info=pays)
 
 # 로그인 페이지
 @app.route('/login')
@@ -81,6 +93,7 @@ def signup():
     pw_receive = str(request.form['pw_give'])
     name_receive = request.form['name_give']
     mail_receive = request.form['mail_give']
+
     try:
         img_receive = request.files['img_give'] 
     except:
@@ -105,7 +118,10 @@ def signup():
     if user:
         return jsonify({"result": "failure", "msg":"이미 존재하는 아이디입니다."})
 
-    new_member = {'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive, 'img' : img_url, 'rec_item' : ''}
+    new_member = {
+        'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive, 'img' : img_url,
+        'rec_item' : ''
+    }
 
     db.users.insert_one(new_member)
     return jsonify({"result": "success", "msg":"가입 완료!"})
@@ -137,11 +153,6 @@ def profile_Page():
 @app.route('/item')
 def item_Page():
     return render_template('item.html')
-
-# 친구추가 요청
-@app.route('/friend')
-def friend_Page():
-    return render_template('friend.html')
 
 # 아이템 추가
 @app.route('/addItem', methods=['POST'])
@@ -185,6 +196,7 @@ def addItem():
         return redirect('/login') 
     except jwt.DecodeError:
         return redirect('/login')
+
 
 # 친구 요청 보내는 API
 @app.route('/send_request/<requested_id>')
@@ -250,44 +262,11 @@ def respond_request(request_id, action):
 def check_notification(request_id):
     db.requests.find_one_and_update({'_id':request_id}, {'$set':{'status':'checked'}})
 
-#item 추가 API
-@app.route('/addItem/test', methods=['POST'])
-def addItemTest() :
-        user_id = 1
-        user = db.users.find_one({'_id': user_id})
-        
-        #  최종에선 이거쓰면됨
-        #user = db.users.find_one({'_id': ObjectId(user_id)})
-
-        name = request.form['name']
-        price = request.form['price']
-        d_day = request.form['d_day']
-        description = request.form['descr']
-        img_url = request.form['img_url'] 
-        
-        # img_url = image_method.extract_image_url(img_url)
-
-        item = {
-            'owner' : {
-                'id' : user_id,
-                'name' : user['name'],
-                'img' : user['image'], 
-            },
-            'name': name,
-            'price': price,
-            'total_fund': 0,
-            'd-day': d_day,
-            'descr': description,
-            'img_url': img_url,
-            'fund_rate': 0
-        }
-        db.items.insert_one(item)
-        return jsonify({'item':'zz'})
 
 # 펀딩 API 추가
 @app.route('/fund/<item_id>', methods=['POST'])
 def funding(item_id):
-    item_id = int(item_id)
+    item_id = ObjectId(item_id)
     item = db.items.find_one({'_id' : item_id})
     print(item)
     price = item['price']
@@ -299,8 +278,42 @@ def funding(item_id):
     print(rounded_rate)
     db.items.update_one({'_id' : item_id},{'$set':{'total_funding':sum}})
     db.items.update_one({'_id' : item_id},{'$set':{'achievement_rate':rounded_rate}})
+
     item = db.items.find_one({'_id' : item_id})
+
+    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+    
+    try:
+        decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
+        user_id = decoded_token['userId']        
+        user = db.users.find_one({'_id': ObjectId(user_id)})
+        sender_name = user['name']
+        db.pay.insert_one({
+            'item_id' : item_id,
+            'sender_name' : sender_name,
+            'price' : received,
+        })
+    except jwt.ExpiredSignatureError:
+        db.pay.insert_one({
+            'item_id' : item_id,
+            'sender_name' : '익명의 기부천사',
+            'price' : received,
+        })
+
+    except jwt.DecodeError:
+        db.pay.insert_one({
+            'item_id' : item_id,
+            'sender_name' : '익명의 기부천사',
+            'price' : received,
+        })
+   
     return jsonify({'result':item})
+
+@app.route('/fund/<item_id>', methods=['GET'])
+def fund_list(item_id) :
+    payList = db.pay.find({'_id' : ObjectId(item_id)})
+    # payList = list(db.pay.find({'_id' : item_id}))
+    return jsonify(payList)
 
 init_db.delete_existing_data()
 init_db.insert_initial_data()
