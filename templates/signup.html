@@ -9,18 +9,13 @@
                 let new_mail = $('#signupEmail').val();
                 let imgInput = $('#signupImg')[0];
                 console.log(imgInput.files[0])
-                let imgFile = imgInput.files[0];
-                
-                const formData = new FormData();
-                formData.append('img',imgFile)
-
-                
-                console.log(formData)
+                let new_img = JSON.stringify(imgInput.files[0]);
+                console.log(new_img)
 
                 $.ajax({
                     type: "POST",
                     url: "/signup",
-                    data: {id_give : new_id, pw_give : new_pw, name_give : new_name, mail_give : new_mail, img_give: },
+                    data: {id_give : new_id, pw_give : new_pw, name_give : new_name, mail_give : new_mail, img_give: new_img},
                     success: function (response) {
                         if (response["result"] == "success") {
                             alert(response["msg"]);
