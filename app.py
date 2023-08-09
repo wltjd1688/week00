@@ -26,22 +26,22 @@ secret_key = 'your_secret_key_here'
 # 메인 페이지
 @app.route('/')
 def main_page():
-    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+    token = request.cookies.get('token') 
 
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
-
-        # user = db.users.find_one({'_id': ObjectId(user_id)})
-        user = db.users.find_one({'_id': int(user_id)})
+        
+        user_id = ObjectId(user_id)
+        user = db.users.find_one({'_id': user_id})
         print(user)
         
         user_items = user['rec_item']
 
         item_list = []
         for itemid in user_items :
-            item = db.items.find_one({'_id': int(itemid)})
-            # item = db.items.find_one({'_id': ObjectId(itemid)})
+            itemid = ObjectId(itemid)
+            item = db.items.find_one({'_id': itemid})
             print(item['date'])
             d_day = our_methods.calcualte_day_left(item['date'])
 
@@ -49,11 +49,12 @@ def main_page():
             if(d_day == 'expired') :
                 removeCheck.append(itemid)
                 db.items.update_one({'_id' : itemid}, {"$set": {"expired": True}})
-                # 만료됨 추가해야해, 그리고 지금 유저의 rec_item에서 제거해야해 (지금 유저에 아이템에서 지우는 건 포문 밖에서 하자)
+                db.users.update_one({'_id' : user_id}, {'$pull': {'rec_item': itemid}})
                 continue
-            
+            item['date'] = d_day
             print(d_day)
             item_list.append(item)
+
         print(item_list)
         return render_template('base.html', title='home', data = item_list)
     except jwt.ExpiredSignatureError:
