@@ -17,7 +17,7 @@ def insert_initial_data():
             'friend': [2, 3],
             'my_item': [1],
             'rec_item': [2, 3, 4, 5],
-            'imag' : 'https://i.pinimg.com/originals/a7/ee/b8/a7eeb85a1d27390ebdf770f8cf31e434.jpg',
+            'img' : 'https://i.pinimg.com/originals/a7/ee/b8/a7eeb85a1d27390ebdf770f8cf31e434.jpg',
             'mail' : 'bae@naver.com'
         },
         {

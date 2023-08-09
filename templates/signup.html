@@ -3,19 +3,29 @@
 {% block content%}
         <script>
             function signUp() {
+                console.log('zzzz')
                 let new_id = $('#signupId').val();
                 let new_pw = $('#signupPw').val();
                 let new_name = $('#signupName').val();
                 let new_mail = $('#signupEmail').val();
                 let imgInput = $('#signupImg')[0];
                 console.log(imgInput.files[0])
-                let new_img = JSON.stringify(imgInput.files[0]);
-                console.log(new_img)
+                console.log(new_id)
+
+                let formData = new FormData();
+                formData.append('id_give', new_id);
+                formData.append('pw_give', new_pw);
+                formData.append('name_give', new_name);
+                formData.append('mail_give', new_mail);
+                formData.append('img_give', imgInput.files[0]);
 
                 $.ajax({
                     type: "POST",
                     url: "/signup",
-                    data: {id_give : new_id, pw_give : new_pw, name_give : new_name, mail_give : new_mail, img_give: new_img},
+                    enctype: "multipart/form-data", //form data 설정
+                    data: formData,
+                    processData: false, // add this here
+                    contentType: false,
                     success: function (response) {
                         if (response["result"] == "success") {
                             alert(response["msg"]);
