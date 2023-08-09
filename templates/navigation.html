@@ -134,13 +134,13 @@
     }
     //--사이트이동
     function mv_profile(){
-        var currentUrl = window.location.href; // 현재 URL 가져오기
-        var newUrl = currentUrl.replace(/\/[^\/]*$/, '/profile'); // 끝부분 변경
+        var currentUrl = window.location.href; 
+        var newUrl = currentUrl.replace(/\/[^\/]*$/, '/profile');
         window.location.href = newUrl;
     }
     function mv_addItem(){
-        var currentUrl = window.location.href; // 현재 URL 가져오기
-        var newUrl = currentUrl.replace(/\/[^\/]*$/, '/addItem'); // 끝부분 변경
+        var currentUrl = window.location.href; 
+        var newUrl = currentUrl.replace(/\/[^\/]*$/, '/addItem');
         window.location.href = newUrl;
     }
     //--친구 추가 요청 보내기
@@ -213,6 +213,7 @@
         <div id="edit-profile" onclick="mv_profile()">개인정보수정</div>
         <div id="addlist" onclick="mv_addItem()">위시리스트 만들기</div>
         <div id="alarm-follow" onclick="alarmShow()">알람
+            <span class="badge badge-secondary">New</span>
             <!-- 알람 모달 -->
             <div class="modal non-show" style="color:black !important; background-color:rgba(0,0,0,0.8);" tabindex="-1" id="alarm-list" onclick="alarmHide()">
                 <div class="modal-dialog" onclick="event.stopPropagation()">

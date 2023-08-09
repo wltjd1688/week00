@@ -8,6 +8,7 @@ from bson.objectid import ObjectId
 import datetime
 # 운영체제에 따라 port 다르게 하기
 import platform
+import sys
 
 # 이미지 URL 추출함수
 import our_methods, init_db
@@ -64,12 +65,12 @@ def main_page():
     except jwt.DecodeError:
         return redirect('/login')
     
-@app.route('/item/<item_id>',methods=['GET'])
+@app.route('/item/<item_id>')
 def item(item_id) :
     item_id = int(item_id)
-    items = list(db.items.find({'_id' : item_id}))
-    pays = list(db.pay.find({'_id' : item_id}))
-    return render_template('detail.html', item_info=items, pay_info=pays)
+    item = db.items.find_one({'_id' : item_id})
+    pay = list(db.pay.find({'item_id' : item_id}))
+    return render_template('detail.html', item_info=item, pay_info=pay)
 
 # 로그인 페이지
 @app.route('/login')
@@ -150,7 +151,9 @@ def signup():
 
     new_member = {
         'user_id':id_receive, 'pw':pw_receive, 'name':name_receive, 'mail':mail_receive, 'img' : img_url,
-        'rec_item' : [], 'my_item' : [], 'friend' : []
+        'rec_item' : [], 
+        'friend' : [], 
+        'my_item' : [], 
     }
 
     db.users.insert_one(new_member)
@@ -312,23 +315,25 @@ def check_notification():
 # 펀딩 API 추가
 @app.route('/fund/<item_id>', methods=['POST'])
 def funding(item_id):
-    item_id = ObjectId(item_id)
+    #item_id = ObjectId(item_id)
+    item_id = int(item_id)
     item = db.items.find_one({'_id' : item_id})
     print(item)
     price = item['price']
     received = int(request.form['money'])
-    before_fund = item['total_funding']
-    sum = before_fund + received
-    rate = (sum) / price * 100
+    before_fund = item['total_fund']
+    mid_fund = before_fund + received
+    print(mid_fund)
+    rate = (mid_fund) / price * 100
     rounded_rate = round(rate, 2)  # 두 자리까지 반올림
     print(rounded_rate)
-    db.items.update_one({'_id' : item_id},{'$set':{'total_funding':sum}})
-    db.items.update_one({'_id' : item_id},{'$set':{'achievement_rate':rounded_rate}})
-
+    result=db.items.update_one({'_id' : item_id},{'$set':{'total_fund':mid_fund}})
+    print(result)
+    db.items.update_one({'_id' : item_id},{'$set':{'fund_rate':rounded_rate}})
     item = db.items.find_one({'_id' : item_id})
 
     token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
-    
+
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']        
@@ -339,20 +344,21 @@ def funding(item_id):
             'sender_name' : sender_name,
             'price' : received,
         })
+        return jsonify({'result':'success'})
     except jwt.ExpiredSignatureError:
         db.pay.insert_one({
             'item_id' : item_id,
             'sender_name' : '익명의 기부천사',
             'price' : received,
         })
-
+        return jsonify({'message':"감사합니다"})
     except jwt.DecodeError:
         db.pay.insert_one({
             'item_id' : item_id,
             'sender_name' : '익명의 기부천사',
             'price' : received,
         })
-    return jsonify({'result':item})
+        return jsonify({'message':"감사합니다"})
 
 @app.route('/fund/<item_id>', methods=['GET'])
 def fund_list(item_id) :

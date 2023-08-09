@@ -6,7 +6,8 @@ db = client.dbjungle
 def delete_existing_data():
     db.users.delete_many({})
     db.items.delete_many({})
-
+    db.pay.delete_many({})
+    
 def insert_initial_data():
     user_data = [
         {

@@ -29,8 +29,6 @@
             }
         </style>
         <script>
-
-
             $(document).ready(function() {
                 $(".icon").on("click",(e)=>{               
                     $(".icon").removeClass("bg-fff");
@@ -72,16 +70,20 @@
                 </div>
             </div>
         </div>
-        <script>
-            
-        </script>
         <div class="container py-4">
             <div id="products">
                 <div class="row" id="productsList">
                     <!-- 카드 for써서 받은정보 자동으로 나오게 만들기, 물건 -->
                     {% block data %}
                         {% for data_item in data%}
-                        <div class="col-3" id="friend-product">
+                        <script>
+                            function mv_detail(){
+                                var currentUrl = window.location.href; // 현재 URL 가져오기
+                                var newUrl = currentUrl.replace(/\/[^\/]*$/, '/detail/{{data_item._id}}'); // 끝부분 변경
+                                window.location.href = newUrl;
+                            }
+                        </script>
+                        <div class="col-3" id="{{ data_item._id}}" onclick="mv_detail()">
                             <div class="media m-auto p-2">
                                 <img class="rounded-circle" src="{{ data_item.owner.img }}" class="mr-3" style="width:24px; height:24px;">
                                 <p class="mb-1 px-2">{{data_item.owner.name}}</p>
