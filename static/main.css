@@ -1,3 +1,6 @@
+*{
+    box-sizing: border-box;
+}
 .main-nav{
     height: 44px;
     width: 100%;
@@ -10,6 +13,11 @@
     padding: 10px;
     display:inline-block;
     vertical-align: bottom;
+    z-index: 10;
+}
+
+.bg-fff{
+    background:#fff;
 }
 
 .icon:hover{
@@ -44,7 +52,7 @@
     color:gainsboro;
 }
 
-.signup-button:hover{
+.signup-button:active{
     text-decoration-line:underline;
     color:black;
 }
@@ -63,6 +71,11 @@
     padding-bottom: 15px;
 }
 
+.bar-content > div > a{
+    text-decoration: none;
+    color:black;
+}
+
 .bar-close{
     z-index:100;
     display:flex;
@@ -72,6 +85,10 @@
     top:15px
 }
 
-.bar-close:hover, .bar-content > div:hover{
+.bar-close:hover, .bar-content > div:hover, .bar-content > div > a:hover{
     color:white;
+}
+
+.non-show{
+    display: none;
 }

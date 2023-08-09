@@ -1,8 +1,5 @@
 <script>
-    $(Document).ready(function(){
-        $(".side-bar").hide()
-    });
-    var count = 0;
+    //-- sideBar--
     function sideBarShow(){
         $(".side-bar").show()
         //개인 프로필, 개인정보, 위시리스트 추가등등 만들기 -->
@@ -12,38 +9,62 @@
     function sideBarHide(){
         $(".side-bar").hide()
     };
+    //--------
 
+    //-- 로그아웃--
     function logOut(){
         if (confirm('진짜 로그아웃 하십니까?')){
-            document.cookie.split(';');
-            document.deleteCookie('token')
+            document.cookie = 'token' + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=[something];"
             location.reload()
         }
         else {
             console.log("로그아웃안함")
         }
     };
+    //----------
+
+    //--token 확인 및 유저정보 받기
+    $(document).ready(function(){
+        try {
+            const cookieValue = document.cookie
+                .split('; ')
+                .find(row => row.startsWith("token="))
+                .split('=')[1];
+            }
+        catch (error) {
+            $('#profile').hide()
+        }
+        finally{
+            console.log(cookieValue)
+            if (cookieValue) {
+            const decodedPayLoad = atob(cookieValue.split('.')[1]);
+            console.log("ㅅ")
+        }}
+            
+    });
 </script>
 
-<div class="side-bar justify-content-center text-center">
-    <div class="m-4" id="profile">
+<!-- 사이드바 -->
+<div class="side-bar justify-content-center text-center non-show">
+    <div class="m-4" id="bar-profile">
         <div class="bar-close" id="close" onclick="sideBarHide()">
             X
         </div>
         <img class="rounded-circle d-inline" src="https://via.placeholder.com/100x100" alt="">
-        <p class="px-2" id="profile">profile</p>
+        <p class="px-2" id="bar-name">profile</p>
     </div>
     <hr>
     <div class="bar-content">
-        <div id="edit-profile">개인정보수정</div>
-        <div id="addlist">위시리스트 만들기</div>
+        <div id="edit-profile"><a href="/profile">개인정보수정</a></div>
+        <div id="addlist"><a href="/item">위시리스트 만들기</a></div>
         <div onclick="logOut()" id="logout">로그아웃</div>
     </div>
 </div>
+<!-- nav -->
 <nav class="navbar navbar-light bg-light justify-content-between">
-    <span class="navbar-brand mb-0 h1">위시리스트</span>
-    <div onclick="sideBarShow()" class="d-inline" id="profile">
+    <a href="/" class="navbar-brand mb-0 h1">위시리스트</a>
+    <div onclick="sideBarShow()" id="profile">
         <img class="rounded-circle float-left " src="https://via.placeholder.com/24x24" alt="">
-        <div class="float-right px-2" id="profile">profile</div>
+        <div class="float-right px-2" id="username">profile</div>
     </div>
 </nav>
