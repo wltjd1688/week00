@@ -10,7 +10,7 @@ import datetime
 import platform
 
 # 이미지 URL 추출함수
-import image_method, init_db
+import our_methods, init_db
 from bson.objectid import ObjectId
 
 import os
@@ -26,26 +26,38 @@ secret_key = 'your_secret_key_here'
 # 메인 페이지
 @app.route('/')
 def main_page():
-    token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
+    token = request.cookies.get('token') 
 
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
-
-        user = db.users.find_one({'_id': ObjectId(user_id)})
+        
+        user_id = ObjectId(user_id)
+        # user_id = int(user_id)
+        user = db.users.find_one({'_id': user_id})
         print(user)
         
         user_items = user['rec_item']
 
         item_list = []
         for itemid in user_items :
-            item = db.items.find_one({'_id': ObjectId(itemid)})
+            itemid = ObjectId(itemid)
+            # itemid = int(itemid)
+            item = db.items.find_one({'_id': itemid})
+            print(item['date'])
+            d_day = our_methods.calcualte_day_left(item['date'])
+
+            removeCheck = []
+            if(d_day == 'expired') :
+                removeCheck.append(itemid)
+                db.items.update_one({'_id' : itemid}, {"$set": {"expired": True}})
+                db.users.update_one({'_id' : user_id}, {'$pull': {'rec_item': itemid}})
+                continue
+            item['date'] = d_day
+            print(d_day)
             item_list.append(item)
 
-        data = [
-            {'items':item_list}
-        ]
-        # return jsonify(data)
+        print(item_list)
         return render_template('base.html', title='home', data = item_list)
     except jwt.ExpiredSignatureError:
         return redirect('/login')  # 토큰이 만료된 경우 로그인 페이지로 리다이렉트
@@ -154,6 +166,7 @@ def whoAmI():
         user_id = decoded_token['userId']
 
         user = db.users.find_one({'_id': ObjectId(user_id)})
+        # user = db.users.find_one({'_id': int(user_id)})
         user_name = user['name']
         user_img = user['img']
         return jsonify({'result' : 'success', 'user_name' : user_name, 'user_img' : user_img})
@@ -181,7 +194,7 @@ def addItem():
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
         user = db.users.find_one({'_id': ObjectId(user_id)})
-        print(user)
+        # user = db.users.find_one({'_id': int(user_id)})
 
         name = request.form['name']
         price = request.form['price']
@@ -189,7 +202,7 @@ def addItem():
         descr = request.form['descr']
         img_url = request.form['img_url'] 
 
-        img_url = image_method.extract_image_url(img_url)
+        img_url = our_methods.extract_image_url(img_url)
 
         item = {
             'owner' : {
@@ -205,9 +218,10 @@ def addItem():
             'img_url': img_url,
             'fund_rate': 0
         }
-        print(item)
-        db.items.insert_one(item)
-
+        result = db.items.insert_one(item)
+        inserted_id = result.inserted_id
+        for friend in user['friend'] :
+            db.users.update_one({'_id' : friend}, {'$push': {'rec_item': inserted_id}})
         return jsonify({'result':'success'})
     except jwt.ExpiredSignatureError:
         return redirect('/login') 
