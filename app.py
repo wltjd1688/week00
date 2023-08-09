@@ -68,8 +68,6 @@ def main_page():
         return redirect('/login')  # 토큰이 만료된 경우 로그인 페이지로 리다이렉트
     except jwt.DecodeError:
         return redirect('/login')
-    
-
 
 # 로그인 페이지
 @app.route('/login')
