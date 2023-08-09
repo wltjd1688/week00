@@ -199,7 +199,7 @@ def addItem():
 
 
 # 친구 요청 보내는 API
-@app.route('/send_request/<requested_id>')
+@app.route('/send_request/<requested_id>', methods=['POST'])
 def send_request(friend_id):
     token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
     try:
@@ -229,7 +229,7 @@ def send_request(friend_id):
         return jsonify({'message': 'Invalid token'}), 401
 
 # 알림 조회하는 API
-@app.route('/notify_get')
+@app.route('/notify_get', methods=['GET'])
 def get_notification():
     token = request.cookies.get('token') #쿠키에서 토큰 가져오기
     try:
@@ -244,7 +244,7 @@ def get_notification():
         return jsonify({'message': 'Invalid token'}), 401
 
 # 요청 수락/거절 전달하는 API
-@app.route('/respond_request/<request_id>/<action>')
+@app.route('/respond_request/<request_id>/<action>', methods=['POST'])
 def respond_request(request_id, action):
     friend_request = db.requests.find_one({'_id':request_id}, {'$set':{'status':'checked'}})
     sender = friend_request['requested_id'] # 요청을 받은 사람이 응답을 보냄
@@ -258,7 +258,7 @@ def respond_request(request_id, action):
     db.requests.insert_one(new_request)
     
 # 알림 확인하는 API
-@app.route('/notify_check')
+@app.route('/notify_check/<request_id>', methods=['POST'])
 def check_notification(request_id):
     db.requests.find_one_and_update({'_id':request_id}, {'$set':{'status':'checked'}})
 
