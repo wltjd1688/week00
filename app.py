@@ -33,6 +33,7 @@ def main_page():
         user_id = decoded_token['userId']
         
         user_id = ObjectId(user_id)
+        # user_id = int(user_id)
         user = db.users.find_one({'_id': user_id})
         print(user)
         
@@ -41,6 +42,7 @@ def main_page():
         item_list = []
         for itemid in user_items :
             itemid = ObjectId(itemid)
+            # itemid = int(itemid)
             item = db.items.find_one({'_id': itemid})
             print(item['date'])
             d_day = our_methods.calcualte_day_left(item['date'])
@@ -164,6 +166,7 @@ def whoAmI():
         user_id = decoded_token['userId']
 
         user = db.users.find_one({'_id': ObjectId(user_id)})
+        # user = db.users.find_one({'_id': int(user_id)})
         user_name = user['name']
         user_img = user['img']
         return jsonify({'result' : 'success', 'user_name' : user_name, 'user_img' : user_img})
@@ -191,7 +194,7 @@ def addItem():
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
         user = db.users.find_one({'_id': ObjectId(user_id)})
-        print(user)
+        # user = db.users.find_one({'_id': int(user_id)})
 
         name = request.form['name']
         price = request.form['price']
@@ -215,9 +218,10 @@ def addItem():
             'img_url': img_url,
             'fund_rate': 0
         }
-        print(item)
-        db.items.insert_one(item)
-
+        result = db.items.insert_one(item)
+        inserted_id = result.inserted_id
+        for friend in user['friend'] :
+            db.users.update_one({'_id' : friend}, {'$push': {'rec_item': inserted_id}})
         return jsonify({'result':'success'})
     except jwt.ExpiredSignatureError:
         return redirect('/login') 
