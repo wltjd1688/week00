@@ -80,6 +80,7 @@
             url: "/send_request/"+friend_id,
             success: function(response) {
                 if (response.result == 'success') {
+                    console.log(1);
                     alert(response.message);
                 } else {
                     alert(response.message);
@@ -145,20 +146,20 @@
         });
     }
     //--수락/거절 응답 전달하기
-    function respondRequest(boolean) {
+    function respondRequest(boolean, id) {
+        let action ='';
         if (boolean) {
-            action = accepted;
+            action = 'accepted';
         } else {
-            action = declined;
-        }
-        let req_id = $('.alarm-request').dataset.id;
-
+            action = 'declined';
+        };
+        console.log(action)
         $.ajax ({
             type: "POST",
-            url: '/respond_request/',
-            data: {'id_give':req_id, 'action':action},
+            url: '/respond_request',
+            data: {'id_give': id, 'action': action},
             success: function(response) {
-                if (response.result == 'success') {
+                if (response.result === 'success') {
                     console.log(response.message);
                 }
             }
@@ -208,47 +209,19 @@
                             </button>                      
                         </div>
                         <div class="modal-body">
-                            <!-- 요청옴 -->
-                            <div class="mx-2 my-1 p-auto border rounded" id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-confirm">
-                                    <p class="m-auto text-center">요청받은사람 이 친구신청을 했습니다.</p>
-                                    <div class="justifly-content-end">
-                                        <span class="btn btn-success mr-1" onclick="respondRequest(true)">수락</span>
-                                        <span class="btn btn-danger" onclick="respondRequest(false)">거절</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- 수락 -->
-                            <div class="mx-2 my-1 p-auto border border-success rounded" id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-yes">
-                                    <p class="m-auto pr-3">요청받은사람 이 친구신청을 받았습니다</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary ">확인</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- 거절 -->
-                            <div class="mx-2 my-1 p-auto border border-danger rounded" id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-no">
-                                    <p class="m-auto pr-3">요청보낸사람 이 친구신청을 거절했습니다.</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary">확인</span>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <!--  -->
         </div>
-        <div id="addlist" onclick="firendShow()">친구추가</div>
+        <div id="addlist" onclick="friendShow()">친구추가</div>
         <!-- 친구찾기 -->
             <div class="non-show bg-light pb-0 mt-2 non-show" id="friend-find">
                 <div class="input-group p-2 ">
                     <input type="text" class="form-control" id="friend_id" placeholder="친구 아이디" aria-label="Recipient's username" aria-describedby="button-addon2">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">찾기</button>
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="sendRequest()">찾기</button>
                     </div>
                 </div>
             </div>

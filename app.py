@@ -220,7 +220,7 @@ def addItem():
         inserted_id = result.inserted_id
         for friend in user['friend'] :
             db.users.update_one({'_id' : friend}, {'$push': {'rec_item': inserted_id}})
-        return jsonify({'result':'success'})
+        return render_template('/')
     except jwt.ExpiredSignatureError:
         return redirect('/login') 
     except jwt.DecodeError:
@@ -265,8 +265,10 @@ def get_notification():
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
-        all_requests = list(db.requests.find({'requested_id':ObjectId(user_id), 'status':'unchecked'}))
+        all_requests = list(db.requests.find({'requested_id':ObjectId(user_id), 'status':'unchecked'}, {'requester_id':False,'requested_id':False}))
         request_num = len(all_requests)
+        for i in all_requests:
+            i['_id'] = str(i['_id'])
         return jsonify({'result':'success', 'all_requests':all_requests, 'request_num':request_num})
     except jwt.ExpiredSignatureError:
         return jsonify({'message': 'Token has expired'}), 401
@@ -278,7 +280,7 @@ def get_notification():
 def respond_request():
     request_id = request.form['id_give']
     action = request.form['action']
-    friend_request = db.requests.find_one({'_id':request_id}, {'$set':{'status':'checked'}})
+    friend_request = db.requests.find_one({'_id':ObjectId(request_id)}, {'$set':{'status':'checked'}})
     sender = friend_request['requested_id'] # 요청을 받은 사람이 응답을 보냄
     receiver = friend_request['requester_id'] # 요청을 보낸 사람이 응답을 받음
 
