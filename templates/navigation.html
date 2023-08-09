@@ -30,6 +30,7 @@
                 .split('; ')
                 .find(row => row.startsWith("token="))
                 .split('=')[1];
+            $('#profile').show()
             }
         catch (error) {
             $('#profile').hide()
@@ -111,15 +112,16 @@
             <!--  -->
         </div>
         <div style="padding:0px" id="addlist"><a onclick="firendShow()">친구찾기</a></div>
-        <div class="non-show bg-light w-100 pb-0 mt-2" id="firend-find">
-            <div class="input-group p-2 ">
-                <input type="text" class="form-control" placeholder="친구 아이디" aria-label="Recipient's username" aria-describedby="button-addon2">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">찾기</button>
+        <!-- 친구찾기 -->
+            <div class="non-show bg-light w-100 pb-0 mt-2" id="firend-find">
+                <div class="input-group p-2 ">
+                    <input type="text" class="form-control" placeholder="친구 아이디" aria-label="Recipient's username" aria-describedby="button-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">찾기</button>
+                    </div>
                 </div>
             </div>
-        </div>
-
+            <!--  -->
         </div>
         <hr>
         <div onclick="logOut()" id="logout">로그아웃</div>
@@ -128,7 +130,7 @@
 <!-- nav -->
 <nav class="navbar navbar-light bg-light justify-content-between">
     <a href="/" class="navbar-brand mb-0 h1">위시리스트</a>
-    <div onclick="sideBarShow()" id="profile">
+    <div class="non-block" onclick="sideBarShow()" id="profile">
         <img class="rounded-circle float-left " src="https://via.placeholder.com/24x24" alt="">
         <div class="float-right px-2" id="username">profile</div>
     </div>
