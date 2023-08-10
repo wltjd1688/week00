@@ -27,39 +27,44 @@ secret_key = 'your_secret_key_here'
 # 메인 페이지
 @app.route('/')
 def main_page():
-    token = request.cookies.get('token') 
-
+    token = request.cookies.get('token')
     try:
         decoded_token = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = decoded_token['userId']
-        
         user_id = ObjectId(user_id)
         # user_id = int(user_id)
         user = db.users.find_one({'_id': user_id})
         print(user)
-        
-        user_items = user['rec_item']
-
-        item_list = []
-        for itemid in user_items :
+        my_items = user['my_item']
+        my_list = []
+        for itemid in my_items :
             itemid = ObjectId(itemid)
-            # itemid = int(itemid)
             item = db.items.find_one({'_id': itemid})
             print(item['date'])
             d_day = our_methods.calcualte_day_left(item['date'])
-
-            removeCheck = []
             if(d_day == 'expired') :
-                removeCheck.append(itemid)
+                db.items.update_one({'_id' : itemid}, {"$set": {"expired": True}})
+                db.users.update_one({'_id' : user_id}, {'$pull': {'rec_item': itemid}})
+                continue
+            item['date'] = d_day
+            print(d_day)
+            my_list.append(item)
+        user_items = user['rec_item']
+        item_list = []
+        for itemid in user_items :
+            itemid = ObjectId(itemid)
+            item = db.items.find_one({'_id': itemid})
+            print(item['date'])
+            d_day = our_methods.calcualte_day_left(item['date'])
+            if(d_day == 'expired') :
                 db.items.update_one({'_id' : itemid}, {"$set": {"expired": True}})
                 db.users.update_one({'_id' : user_id}, {'$pull': {'rec_item': itemid}})
                 continue
             item['date'] = d_day
             print(d_day)
             item_list.append(item)
-
         print(item_list)
-        return render_template('base.html', title='home', data = item_list)
+        return render_template('base.html', title='홈페이지', data = item_list, my_item = my_list)
     except jwt.ExpiredSignatureError:
         return redirect('/login')  # 토큰이 만료된 경우 로그인 페이지로 리다이렉트
     except jwt.DecodeError:
@@ -70,7 +75,7 @@ def item(item_id) :
     item_id = ObjectId(item_id)
     item = db.items.find_one({'_id' : item_id})
     pay = list(db.pay.find({'item_id' : item_id}))
-    return render_template('detail.html', item_info=item, pay_info=pay)
+    return render_template('detail.html', title='item', item_info=item, pay_info=pay)
 
 # 로그인 페이지
 @app.route('/login')
@@ -84,7 +89,7 @@ def login_Page():
         except jwt.ExpiredSignatureError:  # 토큰이 만료된 경우
             pass
 
-    return render_template('login.html', title="login")
+    return render_template('login.html', title="로그인")
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -116,7 +121,7 @@ def signup_page():
         except jwt.ExpiredSignatureError:  # 토큰이 만료된 경우
             pass
 
-    return render_template('signup.html')
+    return render_template('signup.html', title="회원가입")
 
 @app.route('/signup', methods=["POST"])
 def signup():
@@ -181,7 +186,7 @@ def whoAmI():
 # 위시리스트 요청
 @app.route('/addItem')
 def item_Page():
-    return render_template('addItem.html')
+    return render_template('addItem.html', title="선물 고르기")
 
 # 아이템 추가
 @app.route('/addItem', methods=['POST'])

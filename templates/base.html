@@ -47,7 +47,6 @@
         <div class="jumbotron jumbotron-fluid mb-0">
             <div class="container">
                 <h1 class="display-4">친구가 원하는 선물을 주세요!</h1>
-                <p class="lead">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nobis, ea dignissimos rerum quos totam, odio officia quidem debitis, temporibus amet iste aperiam asperiores vel quis dolorum? Sequi ducimus sapiente praesentium!</p>
             </div>
         </div>
         <!-- <div class="border-bottom main-nav" id="main-nav">
@@ -72,6 +71,39 @@
         </div> -->
         <div class="container py-4">
             <div id="products">
+                <h5 class="p-3">내 위시리스트</h5>
+                <div class="row" id="productsList">
+                    {% block my_item %}
+                        {% for md in my_item%}
+                            <script>
+                                function my_mv_detail(){
+                                    var currentUrl = window.location.href; // 현재 URL 가져오기
+                                    var newUrl = currentUrl.replace(/\/[^\/]*$/, '/item/{{md._id}}'); // 끝부분 변경
+                                    window.location.href = newUrl;
+                                }
+                            </script>
+                            <div class="col-12 pb-3" id="{{ md._id}}" onclick="my_mv_detail()">
+                                <div class="card">
+                                    <img src="{{ md.img_url }}" class="card-img-top" >
+                                    <div class="card-tage">
+                                        <div class="progress" style="height: 1px;">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ md.fund_rate }}%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <span class="d-flex justify-content-between perdday">
+                                            <p>{{md.fund_rate}}</p>
+                                            <p class=" d-inline">{{md.date}}</p>
+                                        </span>
+                                    </div>
+                                    <div class="card-body" style="padding-top:0px !important">
+                                        <h5>{{ md.name }}</h5>
+                                        <p>{{md.descr}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endblock my_item %}
+                </div>
+                <h5 class="p-3">친구들의 위시리스트</h5>
                 <div class="row" id="productsList">
                     <!-- 카드 for써서 받은정보 자동으로 나오게 만들기, 물건 -->
                     {% block data %}
@@ -83,7 +115,7 @@
                                 window.location.href = newUrl;
                             }
                         </script>
-                        <div class="col-3" id="{{ data_item._id}}" onclick="mv_detail()">
+                        <div class="col-12 col-sm-6 col-md-3 " id="{{ data_item._id}}" onclick="mv_detail()">
                             <div class="media m-auto p-2">
                                 <img class="rounded-circle" src="{{ data_item.owner.img }}" class="mr-3" style="width:24px; height:24px;">
                                 <p class="mb-1 px-2">{{data_item.owner.name}}</p>
@@ -92,7 +124,7 @@
                                 <img src="{{ data_item.img_url }}" class="card-img-top" >
                                 <div class="card-tage">
                                     <div class="progress" style="height: 1px;">
-                                        <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                        <div class="progress-bar" role="progressbar" style="width: {{data_item.fund_rate}}%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                     <span class="d-flex justify-content-between perdday">
                                         <p>{{data_item.fund_rate}}</p>

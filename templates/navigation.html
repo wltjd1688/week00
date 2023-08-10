@@ -1,5 +1,4 @@
 <script>
-    var count = 0;
     //-- sideBar--
     function sideBarShow(){
         $(".side-bar").show()
@@ -38,8 +37,7 @@
                         localStorage.setItem('userimg',response.user_img);
                         console.log(response.user_img)
                         $('#var-name, #username').text(response.user_name);
-                        //$('#var-img, #userimg').attr('src', "../"+response.user_img);
-                        $('#var-img, #userimg').attr('src', response.user_img);
+                        $('#var-img, #userimg').attr('src', "../"+response.user_img);
                     },
                     error: function(error) {
                         alert("Invalid credentials");
@@ -53,8 +51,8 @@
                         if (response.result === 'success') {
                             let requests = response.all_requests;
                             let req_num = response.request_num;
-                            $('.badge').html('');
-                            $('.badge').text(req_num);
+                            $('.number_badge').html('');
+                            $('.number_badge').text(req_num);
 
                             for (let i=0; i<req_num; i++) {
                                 let request = requests[i];
@@ -194,7 +192,7 @@
     <div class="bar-content">
         <div id="addlist" onclick="mv_addItem()">위시리스트 만들기</div>
         <div id="alarm-follow" onclick="alarmShow()">알람
-            <span class="badge badge-secondary">New</span>
+            <span class="badge badge-secondary number_badge">New</span>
             <!-- 알람 모달 -->
             <div id="alarm-list" onclick="alarmHide()" class="modal non-show" style="color:black !important; background-color:rgba(0,0,0,0.8);" tabindex="-1">
                 <div class="modal-dialog" onclick="event.stopPropagation()">
