@@ -41,7 +41,10 @@
                     <img class="rounded w-100" style="background-size:cover;" src="{{item_info.img_url}}">
                 </div>
                 <div class="col-md-6 rounded bg-light mx-3 p-3">
-                    <h3 class="item-name">{{item_info.name}}</h3>
+                    <div class="d-flex justify-content-between">
+                        <h3 class="item-name">{{item_info.name}}</h3>
+                        <a href="{{item_info.img_url}}" class="badge badge-secondary" style="width:80px; height: 25px;">구매처링크</a>
+                    </div>
                     <hr class="p-1">
                     <div class="d-flex justify-content-around row mb-3">
                         <h5 class="col-4">가격: {{item_info.price}}</h5>
