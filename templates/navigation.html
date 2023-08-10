@@ -56,15 +56,73 @@
     });
     //--알림 모달창 보여주기
     function alarmShow(){
+        $('.modal-body').empty('');
+        $.ajax ({
+            type: "GET",
+            url: "/notify_get",
+            success: function(response) {
+                if (response.result === 'success') {
+                    let requests = response.all_requests;
+                    let req_num = response.request_num;
+                    $('.badge').html('');
+                    $('.badge').text(req_num);                    
+
+                    for (let i=0; i<req_num; i++) {
+                        let request = requests[i];
+                        let req_id = request['_id'];
+                        let name = request['requester_name'];
+                        let content = request['content'];
+                        let temp_html = '';
+                        if (content === "request") {
+                            temp_html = 
+                            `<div class="mx-2 my-1 p-auto border rounded" id="${i}">
+                                <div class="p-2 d-flex justify-content-end" id="alarm-confirm">
+                                    <p class="m-auto text-center">${name}이(가) 친구 신청을 보냈습니다.</p>
+                                    <div class="justifly-content-end">
+                                        <span class="btn btn-success mr-1" onclick="respondRequest(true, '${req_id}')">수락</span>
+                                        <span class="btn btn-danger" onclick="respondRequest(false, '${req_id}')">거절</span>
+                                    </div>
+                                </div>
+                            </div>`;                           
+                        } else if (content == "accepted") {
+                            temp_html =
+                            `<div class="mx-2 my-1 p-auto border border-success rounded" id="alarm-request" id=${i}>
+                                <div class="p-2 d-flex justify-content-end" id="alarm-yes">
+                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 수락하였습니다.</p>
+                                    <div class="d-flex justify-content-end">
+                                        <span class="btn btn-primary " onclick="checkNotification('${req_id}')">확인</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } else {
+                            temp_html =
+                            `<div class="mx-2 my-1 p-auto border border-danger rounded" id="alarm-request" id=${i}>
+                                <div class="p-2 d-flex justify-content-end" id="alarm-no">
+                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 거절하였습니다.</p>
+                                    <div class="d-flex justify-content-end">
+                                        <span class="btn btn-primary" onclick="checkNotification('${req_id}')">확인</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                        }
+                        
+                        $('.modal-body').append(temp_html);
+
+                    }
+                } else {
+                    alert(response.message);
+                }
+            },
+        });
         $("#alarm-list").show()
-    };
+    }
 
     function alarmHide(){
         $("#alarm-list").hide()
     }
     //--친구 찾기창 보여주
-    function firendShow(){
-        $("#firend-find").toggle();
+    function friendShow(){
+        $("#friend-find").toggle();
     }
     function mv_addItem(){
         var currentUrl = window.location.href; 
@@ -79,70 +137,13 @@
             type: "GET",
             url: "/send_request/"+friend_id,
             success: function(response) {
-                if (response.result == 'success') {
+                if (response.result === 'success') {
                     console.log(1);
                     alert(response.message);
                 } else {
                     alert(response.message);
                 }
             }
-        });
-    }
-    //--모든 알림 받기
-    function getNotification(all_requests, request_num) {
-        $.ajax ({
-            type: "GET",
-            url: "/notify_get",
-            success: function(response) {
-                if (response.result == 'success') {
-                    let requests = response.all_requests;
-                    let req_num = response.resquest_num;
-
-                    for (let i=0; i<req_num; i++) {
-                        let request = requests[i];
-                        let req_id = request['_id'];
-                        let name = request['requester_name'];
-                        let content = request['content'];
-                        if (content == "request") {
-                            let temp_html = 
-                            `<div class="mx-2 my-1 p-auto border rounded" data-id=${req_id} id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-confirm">
-                                    <p class="m-auto text-center">${name}이(가) 친구 신청을 보냈습니다.</p>
-                                    <div class="justifly-content-end">
-                                        <span class="btn btn-success mr-1" onclick="respondRequest(true)">수락</span>
-                                        <span class="btn btn-danger" onclick="respondRequest(false)">거절</span>
-                                    </div>
-                                </div>
-                            </div>`;                           
-                        } else if (content == "accepted") {
-                            let temp_html =
-                            `<div class="mx-2 my-1 p-auto border border-success rounded" data-id=${req_id} id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-yes">
-                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 수락하였습니다.</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary " onclick="checkNotification()">확인</span>
-                                    </div>
-                                </div>
-                            </div>`;
-                        } else {
-                            let temp_html =
-                            `<div class="mx-2 my-1 p-auto border border-danger rounded" data-id=${req_id} id="alarm-request">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-no">
-                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 거절하였습니다.</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary" onclick="checkNotification()">확인</span>
-                                    </div>
-                                </div>
-                            </div>`;
-                        }
-                        
-                        $('.modal-body').append(temp_html);
-
-                    }
-                } else {
-                    alert(response.message);
-                }
-            },
         });
     }
     //--수락/거절 응답 전달하기
@@ -164,17 +165,17 @@
                 }
             }
         });
+        $("#"+this.id).hide();
     }
     //--응답 확인하기
-    function checkNotification() {
-        let req_id = $('.alarm-request').dataset.id;
+    function checkNotification(id) {
 
         $.ajax ({
             type: "POST",
             url: '/notify_check',
-            data: {'id_give':req_id},
+            data: {'id_give':id},
             success: function(response) {
-                if (response.result == 'success') {
+                if (response.result === 'success') {
                     console.log(response.message);
                 }
             }

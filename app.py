@@ -11,7 +11,7 @@ import platform
 import sys
 
 # 이미지 URL 추출함수
-import our_methods, init_db
+import our_methods
 from bson.objectid import ObjectId
 
 import os
@@ -67,7 +67,7 @@ def main_page():
     
 @app.route('/item/<item_id>')
 def item(item_id) :
-    item_id = int(item_id)
+    item_id = ObjectId(item_id)
     item = db.items.find_one({'_id' : item_id})
     pay = list(db.pay.find({'item_id' : item_id}))
     return render_template('detail.html', item_info=item, pay_info=pay)
@@ -218,9 +218,10 @@ def addItem():
         }
         result = db.items.insert_one(item)
         inserted_id = result.inserted_id
+        db.users.update_one({'_id':ObjectId(user_id)}, {'$push': {'my_item':inserted_id}})
         for friend in user['friend'] :
             db.users.update_one({'_id' : friend}, {'$push': {'rec_item': inserted_id}})
-        return render_template('/')
+        return redirect(url_for('main_page'))
     except jwt.ExpiredSignatureError:
         return redirect('/login') 
     except jwt.DecodeError:
@@ -285,10 +286,11 @@ def respond_request():
     receiver = friend_request['requester_id'] # 요청을 보낸 사람이 응답을 받음
 
     if action == 'accepted':
-        new_request = {'requester_id':sender, 'requested_id':receiver, 'status':'unchecked', 'content' : 'accepted'}
+        sender_info = db.users.find_one({'_id':ObjectId(sender)})
+        sender_name = sender_info['name']        
+        new_request = {'requester_id':sender, 'requester_name':sender_name, 'requested_id':receiver, 'status':'unchecked', 'content' : 'accepted'}
         db.users.update_one({'_id':ObjectId(receiver)}, {'$push':{'friend':ObjectId(sender)}}) #친구 요청을 보낸 사람의 friend 리스트에 수락을 받은 사람의 '_id'를 추가
         db.users.update_one({'_id':ObjectId(sender)}, {'$push':{'friend':ObjectId(receiver)}}) #친구 요청을 수락한 사람의 friend 리스트에 수락을 요청한 사람의 '_id'를 추가
-        sender_info = db.users.find_one({'_id':ObjectId(sender)})
         sender_item = sender_info['my_item']
         db.users.update_one({'_id':ObjectId(receiver)}, {'$push':{'rec_item':{'$each':sender_item}}})
         receiver_info = db.users.find_one({'_id':ObjectId(receiver)})
@@ -304,17 +306,16 @@ def respond_request():
 @app.route('/notify_check', methods=['POST'])
 def check_notification():
     request_id = request.form['id_give']
-    db.requests.update_one({'_id':request_id}, {'$set':{'status':'checked'}})
+    db.requests.update_one({'_id':ObjectId(request_id)}, {'$set':{'status':'checked'}})
     return jsonify({'result':'success', 'message':'응답을 확인하였습니다.'})
 
 # 펀딩 API 추가
 @app.route('/fund/<item_id>', methods=['POST'])
 def funding(item_id):
-    #item_id = ObjectId(item_id)
-    item_id = int(item_id)
+    item_id = ObjectId(item_id)
     item = db.items.find_one({'_id' : item_id})
     print(item)
-    price = item['price']
+    price = int(item['price'])
     received = int(request.form['money'])
     before_fund = item['total_fund']
     mid_fund = before_fund + received
@@ -354,15 +355,6 @@ def funding(item_id):
             'price' : received,
         })
         return jsonify({'message':"감사합니다"})
-
-@app.route('/fund/<item_id>', methods=['GET'])
-def fund_list(item_id) :
-    payList = db.pay.find({'_id' : ObjectId(item_id)})
-    # payList = list(db.pay.find({'_id' : item_id}))
-    return jsonify(payList)
-
-init_db.delete_existing_data()
-init_db.insert_initial_data()
 
 if platform.system()=="Darwin":
     if __name__ == '__main__':
