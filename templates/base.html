@@ -79,7 +79,7 @@
                         <script>
                             function mv_detail(){
                                 var currentUrl = window.location.href; // 현재 URL 가져오기
-                                var newUrl = currentUrl.replace(/\/[^\/]*$/, '/detail/{{data_item._id}}'); // 끝부분 변경
+                                var newUrl = currentUrl.replace(/\/[^\/]*$/, '/item/{{data_item._id}}'); // 끝부분 변경
                                 window.location.href = newUrl;
                             }
                         </script>
