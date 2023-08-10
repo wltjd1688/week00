@@ -82,7 +82,7 @@
                                     window.location.href = newUrl;
                                 }
                             </script>
-                            <div class="col-12 pb-3" id="{{ md._id}}" onclick="my_mv_detail()">
+                            <div class="col-12 col-sm-6 col-md-3 pb-3" id="{{ md._id}}" onclick="my_mv_detail()">
                                 <div class="card">
                                     <img src="{{ md.img_url }}" class="card-img-top" >
                                     <div class="card-tage">
@@ -115,7 +115,7 @@
                                 window.location.href = newUrl;
                             }
                         </script>
-                        <div class="col-12 col-sm-6 col-md-3 " id="{{ data_item._id}}" onclick="mv_detail()">
+                        <div class="col-12 col-sm-6 col-md-3" id="{{ data_item._id}}" onclick="mv_detail()">
                             <div class="media m-auto p-2">
                                 <img class="rounded-circle" src="{{ data_item.owner.img }}" class="mr-3" style="width:24px; height:24px;">
                                 <p class="mb-1 px-2">{{data_item.owner.name}}</p>
