@@ -233,7 +233,6 @@ def addItem():
         return redirect('/login')
 
 
-# 친구 요청 보내는 API
 @app.route('/send_request/<friend_id>', methods=['GET'])
 def send_request(friend_id):
     token = request.cookies.get('token')  # 쿠키에서 토큰 가져오기
@@ -245,8 +244,12 @@ def send_request(friend_id):
         friend = db.users.find_one({'user_id':friend_id})
         if friend:
             friend_objectId = friend['_id']
+            my_objectId = user['_id']
+            exist = db.requests.find_one({'requester_id':my_objectId,'requested_id':friend_objectId})
             if friend_objectId in user['friend']:
                 return jsonify({'result': 'failure', 'message':'이미 친구 추가가 되어 있습니다.'})
+            elif exist:
+                return jsonify({'result': 'failure', 'message':'이미 친구 요청을 보냈습니다.'})
             else:
                 friend_request = {
                     "requester_id" : requester_id,
