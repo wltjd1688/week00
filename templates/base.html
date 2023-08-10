@@ -73,16 +73,18 @@
             <div id="products">
                 <h5 class="p-3">내 위시리스트</h5>
                 <div class="row" id="productsList">
+                    <script>
+                        function mv_detail(e){
+                            e.stopPropagation();
+                            var here = e.currentTarget.id
+                            var currentUrl = window.location.href;
+                            var newUrl = currentUrl.replace(/\/[^\/]*$/, '/item/'+here);
+                                window.location.href = newUrl;
+                        }
+                    </script>
                     {% block my_item %}
                         {% for md in my_item%}
-                            <script>
-                                function my_mv_detail(){
-                                    var currentUrl = window.location.href; // 현재 URL 가져오기
-                                    var newUrl = currentUrl.replace(/\/[^\/]*$/, '/item/{{md._id}}'); // 끝부분 변경
-                                    window.location.href = newUrl;
-                                }
-                            </script>
-                            <div class="col-12 col-sm-6 col-md-3 pb-3" id="{{ md._id}}" onclick="my_mv_detail()">
+                            <div class="col-12 col-sm-6 col-md-3 pb-3" id="{{ md._id }}" onclick="mv_detail(event)">
                                 <div class="card">
                                     <img src="{{ md.img_url }}" class="card-img-top" >
                                     <div class="card-tage">
@@ -108,14 +110,7 @@
                     <!-- 카드 for써서 받은정보 자동으로 나오게 만들기, 물건 -->
                     {% block data %}
                         {% for data_item in data%}
-                        <script>
-                            function mv_detail(){
-                                var currentUrl = window.location.href; // 현재 URL 가져오기
-                                var newUrl = currentUrl.replace(/\/[^\/]*$/, '/item/{{data_item._id}}'); // 끝부분 변경
-                                window.location.href = newUrl;
-                            }
-                        </script>
-                        <div class="col-12 col-sm-6 col-md-3" id="{{ data_item._id}}" onclick="mv_detail()">
+                        <div class="col-12 col-sm-6 col-md-3" id="{{ data_item._id }}" onclick="mv_detail(event)">
                             <div class="media m-auto p-2">
                                 <img class="rounded-circle" src="{{ data_item.owner.img }}" class="mr-3" style="width:24px; height:24px;">
                                 <p class="mb-1 px-2">{{data_item.owner.name}}</p>

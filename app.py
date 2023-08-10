@@ -40,7 +40,6 @@ def main_page():
         for itemid in my_items :
             itemid = ObjectId(itemid)
             item = db.items.find_one({'_id': itemid})
-            print(item['date'])
             d_day = our_methods.calcualte_day_left(item['date'])
             if(d_day == 'expired') :
                 db.items.update_one({'_id' : itemid}, {"$set": {"expired": True}})
@@ -75,7 +74,7 @@ def item(item_id) :
     item_id = ObjectId(item_id)
     item = db.items.find_one({'_id' : item_id})
     pay = list(db.pay.find({'item_id' : item_id}))
-    return render_template('detail.html', title='item', item_info=item, pay_info=pay)
+    return render_template('detail.html', title='상세페이지', item_info=item, pay_info=pay)
 
 # 로그인 페이지
 @app.route('/login')
