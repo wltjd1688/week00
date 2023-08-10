@@ -220,7 +220,8 @@ def addItem():
         inserted_id = result.inserted_id
         for friend in user['friend'] :
             db.users.update_one({'_id' : friend}, {'$push': {'rec_item': inserted_id}})
-        return render_template('/')
+        response = make_response(redirect('/'))
+        return response
     except jwt.ExpiredSignatureError:
         return redirect('/login') 
     except jwt.DecodeError:

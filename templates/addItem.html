@@ -15,8 +15,10 @@
                     type: "POST",
                     url: "/addItem",
                     data: { name:name_give, price:price_give, date:date_give, descr:descr_give,img_url:img_url_give},
-                    success: function(result) {
+                    success: function(response) {
                         alert("성공적으로 추가되었습니다.")
+                        window.location.href= '/';
+
                     },
                     error: function(error) {
                         alert("오류가 발생하였습니다.")
