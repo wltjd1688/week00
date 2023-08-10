@@ -45,72 +45,76 @@
                     }
                 });
                 $('#profile').show()
-                }
+                $.ajax ({
+                    type: "GET",
+                    url: "/notify_get",
+                    success: function(response) {
+                        if (response.result === 'success') {
+                            let requests = response.all_requests;
+                            let req_num = response.request_num;
+                            $('.badge').html('');
+                            $('.badge').text(req_num);
+
+                            for (let i=0; i<req_num; i++) {
+                                let request = requests[i];
+                                let req_id = request['_id'];
+                                let name = request['requester_name'];
+                                let content = request['content'];
+                                let temp_html = '';
+                                if (content === "request") {
+                                    temp_html =
+                                    `<div class="mx-2 my-1 p-auto border rounded" id="${i}">
+                                        <div class="p-2 d-flex justify-content-end" id="alarm-confirm">
+                                            <p class="m-auto text-center">${name}이(가) 친구 신청을 보냈습니다.</p>
+                                            <div class="justifly-content-end">
+                                                <span class="btn btn-success mr-1" onclick="respondRequest(true, '${req_id}')">수락</span>
+                                                <span class="btn btn-danger" onclick="respondRequest(false, '${req_id}')">거절</span>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                                } else if (content == "accepted") {
+                                    temp_html =
+                                    `<div class="mx-2 my-1 p-auto border border-success rounded" id=${i}>
+                                        <div class="p-2 d-flex justify-content-end" id="alarm-yes">
+                                            <p class="m-auto pr-3">${name}이(가) 친구 신청을 수락하였습니다.</p>
+                                            <div class="d-flex justify-content-end">
+                                                <span class="btn btn-primary " onclick="checkNotification('${req_id}')">확인</span>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                                } else {
+                                    temp_html =
+                                    `<div class="mx-2 my-1 p-auto border border-danger rounded" id=${i}>
+                                        <div class="p-2 d-flex justify-content-end" id="alarm-no">
+                                            <p class="m-auto pr-3">${name}이(가) 친구 신청을 거절하였습니다.</p>
+                                            <div class="d-flex justify-content-end">
+                                                <span class="btn btn-primary" onclick="checkNotification('${req_id}')">확인</span>
+                                            </div>
+                                        </div>
+                                    </div>`;
+                                }
+                                console.log("여기는")
+                                $('.modal-body').append(temp_html);
+                                console.log("여기가?")
+                                
+                            }
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                });
+            }
         catch (error) {
             $('#profile').hide()
         }
     });
     //--알림 모달창 보여주기
     function alarmShow(){
-        $('.modal-body').empty('');
-        $.ajax ({
-            type: "GET",
-            url: "/notify_get",
-            success: function(response) {
-                if (response.result === 'success') {
-                    let requests = response.all_requests;
-                    let req_num = response.request_num;
-                    $('.badge').html('');
-                    $('.badge').text(req_num);
-                    for (let i=0; i<req_num; i++) {
-                        let request = requests[i];
-                        let req_id = request['_id'];
-                        let name = request['requester_name'];
-                        let content = request['content'];
-                        let temp_html = '';
-                        if (content === "request") {
-                            temp_html =
-                            `<div class="mx-2 my-1 p-auto border rounded" id="${i}">
-                                <div class="p-2 d-flex justify-content-end" id="alarm-confirm">
-                                    <p class="m-auto text-center">${name}이(가) 친구 신청을 보냈습니다.</p>
-                                    <div class="justifly-content-end">
-                                        <span class="btn btn-success mr-1" onclick="respondRequest(true, '${req_id}')">수락</span>
-                                        <span class="btn btn-danger" onclick="respondRequest(false, '${req_id}')">거절</span>
-                                    </div>
-                                </div>
-                            </div>`;
-                        } else if (content == "accepted") {
-                            temp_html =
-                            `<div class="mx-2 my-1 p-auto border border-success rounded" id="alarm-request" id=${i}>
-                                <div class="p-2 d-flex justify-content-end" id="alarm-yes">
-                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 수락하였습니다.</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary " onclick="checkNotification('${req_id}')">확인</span>
-                                    </div>
-                                </div>
-                            </div>`;
-                        } else {
-                            temp_html =
-                            `<div class="mx-2 my-1 p-auto border border-danger rounded" id="alarm-request" id=${i}>
-                                <div class="p-2 d-flex justify-content-end" id="alarm-no">
-                                    <p class="m-auto pr-3">${name}이(가) 친구 신청을 거절하였습니다.</p>
-                                    <div class="d-flex justify-content-end">
-                                        <span class="btn btn-primary" onclick="checkNotification('${req_id}')">확인</span>
-                                    </div>
-                                </div>
-                            </div>`;
-                        }
-                        $('.modal-body').append(temp_html);
-                    }
-                } else {
-                    alert(response.message);
-                }
-            },
-        });
         $("#alarm-list").show()
     }
     function alarmHide(){
         $("#alarm-list").hide()
+        console.log(this.id)
     }
     //--친구 찾기창 보여주
     function friendShow(){
@@ -138,7 +142,7 @@
         });
     }
     //--수락/거절 응답 전달하기
-    function respondRequest(boolean, id) {
+    function respondRequest( boolean, id) {
         let action ='';
         if (boolean) {
             action = 'accepted';
@@ -156,7 +160,8 @@
                 }
             }
         });
-        $("#"+this.id).hide();
+        $("#"+$(this).parent().parent().parent().attr('id')).hide();
+        console.log(1)
     }
     //--응답 확인하기
     function checkNotification(id) {
@@ -189,13 +194,13 @@
         <div id="alarm-follow" onclick="alarmShow()">알람
             <span class="badge badge-secondary">New</span>
             <!-- 알람 모달 -->
-            <div class="modal non-show" style="color:black !important; background-color:rgba(0,0,0,0.8);" tabindex="-1" id="alarm-list" onclick="alarmHide()">
+            <div id="alarm-list" onclick="alarmHide()" class="modal non-show" style="color:black !important; background-color:rgba(0,0,0,0.8);" tabindex="-1">
                 <div class="modal-dialog" onclick="event.stopPropagation()">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">알람</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true" onclick="alarmHide()">&times;</span>
+                                <span aria-hidden="true" onclick="alarmHide()" >&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
