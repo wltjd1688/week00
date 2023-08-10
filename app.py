@@ -198,9 +198,9 @@ def addItem():
         price = request.form['price']
         date = request.form['date']
         descr = request.form['descr']
-        img_url = request.form['img_url'] 
+        prod_url = request.form['img_url'] 
 
-        img_url = our_methods.extract_image_url(img_url)
+        img_url = our_methods.extract_image_url(prod_url)
 
         item = {
             'owner' : {
@@ -214,6 +214,7 @@ def addItem():
             'date': date,
             'descr': descr,
             'img_url': img_url,
+            'item_url': prod_url,
             'fund_rate': 0
         }
         result = db.items.insert_one(item)
