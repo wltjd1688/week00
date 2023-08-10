@@ -1,4 +1,5 @@
 <script>
+    var count = 0;
     //-- sideBar--
     function sideBarShow(){
         $(".side-bar").show()
@@ -115,7 +116,7 @@
     }
     function alarmHide(){
         $("#alarm-list").hide()
-        console.log(this.id)
+        window.location.reload();
     }
     //--친구 찾기창 보여주
     function friendShow(){
